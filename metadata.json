@@ -1,0 +1,6 @@
+{
+  "name": "White Background",
+  "description": "An interactive grid puzzle game with 20 progressive levels across 2x2, 3x3, 4x4, and 5x5 grids with multiple vibrant colors where creating continuous orthogonal connected sets matching numbered tile counts completes each level.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
