@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type CSSProperties } from 'react';
 import { CheckCircle2, RotateCcw, ArrowRight, HelpCircle, X, Sparkles, Undo2, Lock, Play, Grid } from 'lucide-react';
 
 type TileColor = 'red' | 'yellow' | 'green' | 'blue' | 'purple' | 'orange' | 'pink' | 'cyan' | 'lime' | 'indigo' | 'amber' | 'joker' | 'grey';
@@ -1419,6 +1419,525 @@ const LEVELS: LevelConfig[] = [
       { id: 'l45-tile-36', color: 'grey' },
     ],
   },
+  {
+    id: 46,
+    title: 'Level 46',
+    gridSize: 4,
+    initialTiles: [
+      { id: 'l46-tile-1', color: 'red' },
+      { id: 'l46-tile-2', color: 'red' },
+      { id: 'l46-tile-3', color: 'yellow' },
+      { id: 'l46-tile-4', color: 'blue', number: 3 },
+      { id: 'l46-tile-5', color: 'red' },
+      { id: 'l46-tile-6', color: 'red', number: 4 },
+      { id: 'l46-tile-7', color: 'grey' },
+      { id: 'l46-tile-8', color: 'yellow' },
+      { id: 'l46-tile-9', color: 'blue' },
+      { id: 'l46-tile-10', color: 'red' },
+      { id: 'l46-tile-11', color: 'grey' },
+      { id: 'l46-tile-12', color: 'grey' },
+      { id: 'l46-tile-13', color: 'yellow', number: 3 },
+      { id: 'l46-tile-14', color: 'grey' },
+      { id: 'l46-tile-15', color: 'blue' },
+      { id: 'l46-tile-16', color: 'grey' },
+    ],
+  },
+  {
+    id: 47,
+    title: 'Level 47',
+    gridSize: 4,
+    initialTiles: [
+      { id: 'l47-tile-1', color: 'purple', number: 4 },
+      { id: 'l47-tile-2', color: 'purple' },
+      { id: 'l47-tile-3', color: 'purple' },
+      { id: 'l47-tile-4', color: 'yellow', number: 3 },
+      { id: 'l47-tile-5', color: 'purple' },
+      { id: 'l47-tile-6', color: 'purple' },
+      { id: 'l47-tile-7', color: 'grey' },
+      { id: 'l47-tile-8', color: 'yellow' },
+      { id: 'l47-tile-9', color: 'grey' },
+      { id: 'l47-tile-10', color: 'green' },
+      { id: 'l47-tile-11', color: 'grey' },
+      { id: 'l47-tile-12', color: 'green' },
+      { id: 'l47-tile-13', color: 'green', number: 3 },
+      { id: 'l47-tile-14', color: 'yellow' },
+      { id: 'l47-tile-15', color: 'grey' },
+      { id: 'l47-tile-16', color: 'grey' },
+    ],
+  },
+  {
+    id: 48,
+    title: 'Level 48',
+    gridSize: 4,
+    initialTiles: [
+      { id: 'l48-tile-1', color: 'cyan', number: 4 },
+      { id: 'l48-tile-2', color: 'cyan' },
+      { id: 'l48-tile-3', color: 'cyan' },
+      { id: 'l48-tile-4', color: 'grey' },
+      { id: 'l48-tile-5', color: 'cyan' },
+      { id: 'l48-tile-6', color: 'cyan' },
+      { id: 'l48-tile-7', color: 'orange' },
+      { id: 'l48-tile-8', color: 'pink' },
+      { id: 'l48-tile-9', color: 'grey' },
+      { id: 'l48-tile-10', color: 'orange' },
+      { id: 'l48-tile-11', color: 'grey' },
+      { id: 'l48-tile-12', color: 'pink', number: 3 },
+      { id: 'l48-tile-13', color: 'orange', number: 3 },
+      { id: 'l48-tile-14', color: 'orange' },
+      { id: 'l48-tile-15', color: 'joker', isJoker: true },
+      { id: 'l48-tile-16', color: 'grey' },
+    ],
+  },
+  {
+    id: 49,
+    title: 'Level 49',
+    gridSize: 5,
+    initialTiles: [
+      { id: 'l49-tile-1', color: 'blue', number: 4 },
+      { id: 'l49-tile-2', color: 'blue' },
+      { id: 'l49-tile-3', color: 'blue' },
+      { id: 'l49-tile-4', color: 'amber' },
+      { id: 'l49-tile-5', color: 'amber', number: 4 },
+      { id: 'l49-tile-6', color: 'blue' },
+      { id: 'l49-tile-7', color: 'blue' },
+      { id: 'l49-tile-8', color: 'grey' },
+      { id: 'l49-tile-9', color: 'amber' },
+      { id: 'l49-tile-10', color: 'amber' },
+      { id: 'l49-tile-11', color: 'grey' },
+      { id: 'l49-tile-12', color: 'amber' },
+      { id: 'l49-tile-13', color: 'red', number: 3 },
+      { id: 'l49-tile-14', color: 'grey' },
+      { id: 'l49-tile-15', color: 'red' },
+      { id: 'l49-tile-16', color: 'grey' },
+      { id: 'l49-tile-17', color: 'lime' },
+      { id: 'l49-tile-18', color: 'lime' },
+      { id: 'l49-tile-19', color: 'grey' },
+      { id: 'l49-tile-20', color: 'lime' },
+      { id: 'l49-tile-21', color: 'grey' },
+      { id: 'l49-tile-22', color: 'red' },
+      { id: 'l49-tile-23', color: 'lime', number: 4 },
+      { id: 'l49-tile-24', color: 'grey' },
+      { id: 'l49-tile-25', color: 'grey' },
+    ],
+  },
+  {
+    id: 50,
+    title: 'Level 50',
+    gridSize: 5,
+    initialTiles: [
+      { id: 'l50-tile-1', color: 'red', number: 5 },
+      { id: 'l50-tile-2', color: 'red' },
+      { id: 'l50-tile-3', color: 'red' },
+      { id: 'l50-tile-4', color: 'red' },
+      { id: 'l50-tile-5', color: 'yellow', number: 4 },
+      { id: 'l50-tile-6', color: 'red' },
+      { id: 'l50-tile-7', color: 'red' },
+      { id: 'l50-tile-8', color: 'grey' },
+      { id: 'l50-tile-9', color: 'grey' },
+      { id: 'l50-tile-10', color: 'yellow' },
+      { id: 'l50-tile-11', color: 'cyan', number: 3 },
+      { id: 'l50-tile-12', color: 'grey' },
+      { id: 'l50-tile-13', color: 'joker', isJoker: true },
+      { id: 'l50-tile-14', color: 'yellow' },
+      { id: 'l50-tile-15', color: 'yellow' },
+      { id: 'l50-tile-16', color: 'cyan' },
+      { id: 'l50-tile-17', color: 'indigo' },
+      { id: 'l50-tile-18', color: 'indigo' },
+      { id: 'l50-tile-19', color: 'grey' },
+      { id: 'l50-tile-20', color: 'yellow' },
+      { id: 'l50-tile-21', color: 'grey' },
+      { id: 'l50-tile-22', color: 'grey' },
+      { id: 'l50-tile-23', color: 'indigo', number: 3 },
+      { id: 'l50-tile-24', color: 'joker', isJoker: true },
+      { id: 'l50-tile-25', color: 'grey' },
+    ],
+  },
+  {
+    id: 51,
+    title: 'Level 51',
+    gridSize: 5,
+    initialTiles: [
+      { id: 'l51-tile-1', color: 'red', number: 4 },
+      { id: 'l51-tile-2', color: 'red' },
+      { id: 'l51-tile-3', color: 'red' },
+      { id: 'l51-tile-4', color: 'blue' },
+      { id: 'l51-tile-5', color: 'blue', number: 4 },
+      { id: 'l51-tile-6', color: 'red' },
+      { id: 'l51-tile-7', color: 'red' },
+      { id: 'l51-tile-8', color: 'grey' },
+      { id: 'l51-tile-9', color: 'grey' },
+      { id: 'l51-tile-10', color: 'blue' },
+      { id: 'l51-tile-11', color: 'yellow' },
+      { id: 'l51-tile-12', color: 'grey' },
+      { id: 'l51-tile-13', color: 'joker', isJoker: true },
+      { id: 'l51-tile-14', color: 'blue' },
+      { id: 'l51-tile-15', color: 'blue' },
+      { id: 'l51-tile-16', color: 'yellow' },
+      { id: 'l51-tile-17', color: 'grey' },
+      { id: 'l51-tile-18', color: 'green' },
+      { id: 'l51-tile-19', color: 'green', number: 4 },
+      { id: 'l51-tile-20', color: 'green' },
+      { id: 'l51-tile-21', color: 'yellow', number: 4 },
+      { id: 'l51-tile-22', color: 'green' },
+      { id: 'l51-tile-23', color: 'grey' },
+      { id: 'l51-tile-24', color: 'grey' },
+      { id: 'l51-tile-25', color: 'grey' },
+    ],
+  },
+  {
+    id: 52,
+    title: 'Level 52',
+    gridSize: 5,
+    initialTiles: [
+      { id: 'l52-tile-1', color: 'purple', number: 4 },
+      { id: 'l52-tile-2', color: 'purple' },
+      { id: 'l52-tile-3', color: 'purple' },
+      { id: 'l52-tile-4', color: 'purple' },
+      { id: 'l52-tile-5', color: 'orange', number: 4 },
+      { id: 'l52-tile-6', color: 'purple' },
+      { id: 'l52-tile-7', color: 'purple' },
+      { id: 'l52-tile-8', color: 'grey' },
+      { id: 'l52-tile-9', color: 'orange' },
+      { id: 'l52-tile-10', color: 'orange' },
+      { id: 'l52-tile-11', color: 'cyan', number: 3 },
+      { id: 'l52-tile-12', color: 'cyan' },
+      { id: 'l52-tile-13', color: 'grey' },
+      { id: 'l52-tile-14', color: 'joker', isJoker: true },
+      { id: 'l52-tile-15', color: 'orange' },
+      { id: 'l52-tile-16', color: 'grey' },
+      { id: 'l52-tile-17', color: 'lime' },
+      { id: 'l52-tile-18', color: 'joker', isJoker: true },
+      { id: 'l52-tile-19', color: 'amber' },
+      { id: 'l52-tile-20', color: 'amber' },
+      { id: 'l52-tile-21', color: 'lime', number: 3 },
+      { id: 'l52-tile-22', color: 'grey' },
+      { id: 'l52-tile-23', color: 'grey' },
+      { id: 'l52-tile-24', color: 'grey' },
+      { id: 'l52-tile-25', color: 'amber', number: 3 },
+    ],
+  },
+  {
+    id: 53,
+    title: 'Level 53',
+    gridSize: 5,
+    initialTiles: [
+      { id: 'l53-tile-1', color: 'indigo', number: 4 },
+      { id: 'l53-tile-2', color: 'indigo' },
+      { id: 'l53-tile-3', color: 'indigo' },
+      { id: 'l53-tile-4', color: 'pink' },
+      { id: 'l53-tile-5', color: 'pink', number: 4 },
+      { id: 'l53-tile-6', color: 'indigo' },
+      { id: 'l53-tile-7', color: 'indigo' },
+      { id: 'l53-tile-8', color: 'grey' },
+      { id: 'l53-tile-9', color: 'pink' },
+      { id: 'l53-tile-10', color: 'pink' },
+      { id: 'l53-tile-11', color: 'yellow', number: 3 },
+      { id: 'l53-tile-12', color: 'grey' },
+      { id: 'l53-tile-13', color: 'pink' },
+      { id: 'l53-tile-14', color: 'red' },
+      { id: 'l53-tile-15', color: 'red', number: 3 },
+      { id: 'l53-tile-16', color: 'yellow' },
+      { id: 'l53-tile-17', color: 'joker', isJoker: true },
+      { id: 'l53-tile-18', color: 'green' },
+      { id: 'l53-tile-19', color: 'grey' },
+      { id: 'l53-tile-20', color: 'red' },
+      { id: 'l53-tile-21', color: 'grey' },
+      { id: 'l53-tile-22', color: 'green', number: 3 },
+      { id: 'l53-tile-23', color: 'green' },
+      { id: 'l53-tile-24', color: 'grey' },
+      { id: 'l53-tile-25', color: 'grey' },
+    ],
+  },
+  {
+    id: 54,
+    title: 'Level 54',
+    gridSize: 5,
+    initialTiles: [
+      { id: 'l54-tile-1', color: 'blue', number: 4 },
+      { id: 'l54-tile-2', color: 'blue' },
+      { id: 'l54-tile-3', color: 'blue' },
+      { id: 'l54-tile-4', color: 'blue' },
+      { id: 'l54-tile-5', color: 'amber', number: 4 },
+      { id: 'l54-tile-6', color: 'blue' },
+      { id: 'l54-tile-7', color: 'blue' },
+      { id: 'l54-tile-8', color: 'grey' },
+      { id: 'l54-tile-9', color: 'amber' },
+      { id: 'l54-tile-10', color: 'amber' },
+      { id: 'l54-tile-11', color: 'purple', number: 3 },
+      { id: 'l54-tile-12', color: 'amber' },
+      { id: 'l54-tile-13', color: 'grey' },
+      { id: 'l54-tile-14', color: 'lime' },
+      { id: 'l54-tile-15', color: 'amber' },
+      { id: 'l54-tile-16', color: 'purple' },
+      { id: 'l54-tile-17', color: 'lime' },
+      { id: 'l54-tile-18', color: 'lime' },
+      { id: 'l54-tile-19', color: 'grey' },
+      { id: 'l54-tile-20', color: 'grey' },
+      { id: 'l54-tile-21', color: 'purple' },
+      { id: 'l54-tile-22', color: 'lime', number: 4 },
+      { id: 'l54-tile-23', color: 'lime' },
+      { id: 'l54-tile-24', color: 'grey' },
+      { id: 'l54-tile-25', color: 'grey' },
+    ],
+  },
+  {
+    id: 55,
+    title: 'Level 55',
+    gridSize: 6,
+    initialTiles: [
+      { id: 'l55-tile-1', color: 'red', number: 5 },
+      { id: 'l55-tile-2', color: 'red' },
+      { id: 'l55-tile-3', color: 'red' },
+      { id: 'l55-tile-4', color: 'red' },
+      { id: 'l55-tile-5', color: 'cyan', number: 4 },
+      { id: 'l55-tile-6', color: 'cyan' },
+      { id: 'l55-tile-7', color: 'red' },
+      { id: 'l55-tile-8', color: 'red' },
+      { id: 'l55-tile-9', color: 'red' },
+      { id: 'l55-tile-10', color: 'grey' },
+      { id: 'l55-tile-11', color: 'cyan' },
+      { id: 'l55-tile-12', color: 'cyan' },
+      { id: 'l55-tile-13', color: 'yellow', number: 4 },
+      { id: 'l55-tile-14', color: 'yellow' },
+      { id: 'l55-tile-15', color: 'grey' },
+      { id: 'l55-tile-16', color: 'joker', isJoker: true },
+      { id: 'l55-tile-17', color: 'grey' },
+      { id: 'l55-tile-18', color: 'grey' },
+      { id: 'l55-tile-19', color: 'yellow' },
+      { id: 'l55-tile-20', color: 'grey' },
+      { id: 'l55-tile-21', color: 'joker', isJoker: true },
+      { id: 'l55-tile-22', color: 'purple' },
+      { id: 'l55-tile-23', color: 'purple', number: 4 },
+      { id: 'l55-tile-24', color: 'grey' },
+      { id: 'l55-tile-25', color: 'grey' },
+      { id: 'l55-tile-26', color: 'pink' },
+      { id: 'l55-tile-27', color: 'pink' },
+      { id: 'l55-tile-28', color: 'purple' },
+      { id: 'l55-tile-29', color: 'grey' },
+      { id: 'l55-tile-30', color: 'grey' },
+      { id: 'l55-tile-31', color: 'pink', number: 5 },
+      { id: 'l55-tile-32', color: 'pink' },
+      { id: 'l55-tile-33', color: 'pink' },
+      { id: 'l55-tile-34', color: 'grey' },
+      { id: 'l55-tile-35', color: 'grey' },
+      { id: 'l55-tile-36', color: 'grey' },
+    ],
+  },
+  {
+    id: 56,
+    title: 'Level 56',
+    gridSize: 6,
+    initialTiles: [
+      { id: 'l56-tile-1', color: 'indigo', number: 5 },
+      { id: 'l56-tile-2', color: 'indigo' },
+      { id: 'l56-tile-3', color: 'indigo' },
+      { id: 'l56-tile-4', color: 'indigo' },
+      { id: 'l56-tile-5', color: 'orange', number: 4 },
+      { id: 'l56-tile-6', color: 'orange' },
+      { id: 'l56-tile-7', color: 'indigo' },
+      { id: 'l56-tile-8', color: 'indigo' },
+      { id: 'l56-tile-9', color: 'indigo' },
+      { id: 'l56-tile-10', color: 'grey' },
+      { id: 'l56-tile-11', color: 'orange' },
+      { id: 'l56-tile-12', color: 'orange' },
+      { id: 'l56-tile-13', color: 'lime', number: 4 },
+      { id: 'l56-tile-14', color: 'lime' },
+      { id: 'l56-tile-15', color: 'grey' },
+      { id: 'l56-tile-16', color: 'orange' },
+      { id: 'l56-tile-17', color: 'pink' },
+      { id: 'l56-tile-18', color: 'pink', number: 4 },
+      { id: 'l56-tile-19', color: 'lime' },
+      { id: 'l56-tile-20', color: 'grey' },
+      { id: 'l56-tile-21', color: 'joker', isJoker: true },
+      { id: 'l56-tile-22', color: 'joker', isJoker: true },
+      { id: 'l56-tile-23', color: 'pink' },
+      { id: 'l56-tile-24', color: 'grey' },
+      { id: 'l56-tile-25', color: 'amber', number: 3 },
+      { id: 'l56-tile-26', color: 'amber' },
+      { id: 'l56-tile-27', color: 'grey' },
+      { id: 'l56-tile-28', color: 'grey' },
+      { id: 'l56-tile-29', color: 'blue' },
+      { id: 'l56-tile-30', color: 'blue', number: 3 },
+      { id: 'l56-tile-31', color: 'amber' },
+      { id: 'l56-tile-32', color: 'grey' },
+      { id: 'l56-tile-33', color: 'grey' },
+      { id: 'l56-tile-34', color: 'blue' },
+      { id: 'l56-tile-35', color: 'grey' },
+      { id: 'l56-tile-36', color: 'grey' },
+    ],
+  },
+  {
+    id: 57,
+    title: 'Level 57',
+    gridSize: 6,
+    initialTiles: [
+      { id: 'l57-tile-1', color: 'red', number: 5 },
+      { id: 'l57-tile-2', color: 'red' },
+      { id: 'l57-tile-3', color: 'red' },
+      { id: 'l57-tile-4', color: 'red' },
+      { id: 'l57-tile-5', color: 'yellow', number: 5 },
+      { id: 'l57-tile-6', color: 'yellow' },
+      { id: 'l57-tile-7', color: 'red' },
+      { id: 'l57-tile-8', color: 'red' },
+      { id: 'l57-tile-9', color: 'red' },
+      { id: 'l57-tile-10', color: 'grey' },
+      { id: 'l57-tile-11', color: 'yellow' },
+      { id: 'l57-tile-12', color: 'yellow' },
+      { id: 'l57-tile-13', color: 'cyan', number: 4 },
+      { id: 'l57-tile-14', color: 'cyan' },
+      { id: 'l57-tile-15', color: 'grey' },
+      { id: 'l57-tile-16', color: 'yellow' },
+      { id: 'l57-tile-17', color: 'yellow' },
+      { id: 'l57-tile-18', color: 'grey' },
+      { id: 'l57-tile-19', color: 'cyan' },
+      { id: 'l57-tile-20', color: 'cyan' },
+      { id: 'l57-tile-21', color: 'grey' },
+      { id: 'l57-tile-22', color: 'purple' },
+      { id: 'l57-tile-23', color: 'purple', number: 4 },
+      { id: 'l57-tile-24', color: 'purple' },
+      { id: 'l57-tile-25', color: 'blue', number: 4 },
+      { id: 'l57-tile-26', color: 'blue' },
+      { id: 'l57-tile-27', color: 'joker', isJoker: true },
+      { id: 'l57-tile-28', color: 'grey' },
+      { id: 'l57-tile-29', color: 'amber' },
+      { id: 'l57-tile-30', color: 'amber', number: 3 },
+      { id: 'l57-tile-31', color: 'blue' },
+      { id: 'l57-tile-32', color: 'blue' },
+      { id: 'l57-tile-33', color: 'grey' },
+      { id: 'l57-tile-34', color: 'amber' },
+      { id: 'l57-tile-35', color: 'grey' },
+      { id: 'l57-tile-36', color: 'grey' },
+    ],
+  },
+  {
+    id: 58,
+    title: 'Level 58',
+    gridSize: 6,
+    initialTiles: [
+      { id: 'l58-tile-1', color: 'indigo', number: 5 },
+      { id: 'l58-tile-2', color: 'indigo' },
+      { id: 'l58-tile-3', color: 'indigo' },
+      { id: 'l58-tile-4', color: 'indigo' },
+      { id: 'l58-tile-5', color: 'orange', number: 4 },
+      { id: 'l58-tile-6', color: 'orange' },
+      { id: 'l58-tile-7', color: 'indigo' },
+      { id: 'l58-tile-8', color: 'indigo' },
+      { id: 'l58-tile-9', color: 'indigo' },
+      { id: 'l58-tile-10', color: 'grey' },
+      { id: 'l58-tile-11', color: 'orange' },
+      { id: 'l58-tile-12', color: 'orange' },
+      { id: 'l58-tile-13', color: 'lime', number: 4 },
+      { id: 'l58-tile-14', color: 'lime' },
+      { id: 'l58-tile-15', color: 'grey' },
+      { id: 'l58-tile-16', color: 'joker', isJoker: true },
+      { id: 'l58-tile-17', color: 'pink' },
+      { id: 'l58-tile-18', color: 'pink', number: 4 },
+      { id: 'l58-tile-19', color: 'lime' },
+      { id: 'l58-tile-20', color: 'grey' },
+      { id: 'l58-tile-21', color: 'joker', isJoker: true },
+      { id: 'l58-tile-22', color: 'joker', isJoker: true },
+      { id: 'l58-tile-23', color: 'pink' },
+      { id: 'l58-tile-24', color: 'grey' },
+      { id: 'l58-tile-25', color: 'blue', number: 4 },
+      { id: 'l58-tile-26', color: 'blue' },
+      { id: 'l58-tile-27', color: 'grey' },
+      { id: 'l58-tile-28', color: 'grey' },
+      { id: 'l58-tile-29', color: 'amber' },
+      { id: 'l58-tile-30', color: 'amber', number: 4 },
+      { id: 'l58-tile-31', color: 'blue' },
+      { id: 'l58-tile-32', color: 'grey' },
+      { id: 'l58-tile-33', color: 'grey' },
+      { id: 'l58-tile-34', color: 'amber' },
+      { id: 'l58-tile-35', color: 'amber' },
+      { id: 'l58-tile-36', color: 'grey' },
+    ],
+  },
+  {
+    id: 59,
+    title: 'Level 59',
+    gridSize: 6,
+    initialTiles: [
+      { id: 'l59-tile-1', color: 'red', number: 5 },
+      { id: 'l59-tile-2', color: 'red' },
+      { id: 'l59-tile-3', color: 'red' },
+      { id: 'l59-tile-4', color: 'red' },
+      { id: 'l59-tile-5', color: 'yellow', number: 5 },
+      { id: 'l59-tile-6', color: 'yellow' },
+      { id: 'l59-tile-7', color: 'red' },
+      { id: 'l59-tile-8', color: 'red' },
+      { id: 'l59-tile-9', color: 'red' },
+      { id: 'l59-tile-10', color: 'grey' },
+      { id: 'l59-tile-11', color: 'yellow' },
+      { id: 'l59-tile-12', color: 'yellow' },
+      { id: 'l59-tile-13', color: 'cyan', number: 5 },
+      { id: 'l59-tile-14', color: 'cyan' },
+      { id: 'l59-tile-15', color: 'cyan' },
+      { id: 'l59-tile-16', color: 'yellow' },
+      { id: 'l59-tile-17', color: 'yellow' },
+      { id: 'l59-tile-18', color: 'yellow' },
+      { id: 'l59-tile-19', color: 'cyan' },
+      { id: 'l59-tile-20', color: 'cyan' },
+      { id: 'l59-tile-21', color: 'cyan' },
+      { id: 'l59-tile-22', color: 'purple' },
+      { id: 'l59-tile-23', color: 'purple', number: 4 },
+      { id: 'l59-tile-24', color: 'purple' },
+      { id: 'l59-tile-25', color: 'blue', number: 4 },
+      { id: 'l59-tile-26', color: 'blue' },
+      { id: 'l59-tile-27', color: 'joker', isJoker: true },
+      { id: 'l59-tile-28', color: 'joker', isJoker: true },
+      { id: 'l59-tile-29', color: 'orange' },
+      { id: 'l59-tile-30', color: 'orange', number: 3 },
+      { id: 'l59-tile-31', color: 'blue' },
+      { id: 'l59-tile-32', color: 'grey' },
+      { id: 'l59-tile-33', color: 'grey' },
+      { id: 'l59-tile-34', color: 'orange' },
+      { id: 'l59-tile-35', color: 'grey' },
+      { id: 'l59-tile-36', color: 'grey' },
+    ],
+  },
+  {
+    id: 60,
+    title: 'Level 60',
+    gridSize: 6,
+    initialTiles: [
+      { id: 'l60-tile-1', color: 'indigo', number: 5 },
+      { id: 'l60-tile-2', color: 'indigo' },
+      { id: 'l60-tile-3', color: 'indigo' },
+      { id: 'l60-tile-4', color: 'indigo' },
+      { id: 'l60-tile-5', color: 'amber', number: 5 },
+      { id: 'l60-tile-6', color: 'amber' },
+      { id: 'l60-tile-7', color: 'indigo' },
+      { id: 'l60-tile-8', color: 'indigo' },
+      { id: 'l60-tile-9', color: 'indigo' },
+      { id: 'l60-tile-10', color: 'grey' },
+      { id: 'l60-tile-11', color: 'amber' },
+      { id: 'l60-tile-12', color: 'amber' },
+      { id: 'l60-tile-13', color: 'lime', number: 5 },
+      { id: 'l60-tile-14', color: 'lime' },
+      { id: 'l60-tile-15', color: 'lime' },
+      { id: 'l60-tile-16', color: 'amber' },
+      { id: 'l60-tile-17', color: 'amber' },
+      { id: 'l60-tile-18', color: 'amber' },
+      { id: 'l60-tile-19', color: 'lime' },
+      { id: 'l60-tile-20', color: 'lime' },
+      { id: 'l60-tile-21', color: 'lime' },
+      { id: 'l60-tile-22', color: 'pink' },
+      { id: 'l60-tile-23', color: 'pink', number: 4 },
+      { id: 'l60-tile-24', color: 'pink' },
+      { id: 'l60-tile-25', color: 'blue', number: 4 },
+      { id: 'l60-tile-26', color: 'blue' },
+      { id: 'l60-tile-27', color: 'joker', isJoker: true },
+      { id: 'l60-tile-28', color: 'joker', isJoker: true },
+      { id: 'l60-tile-29', color: 'red' },
+      { id: 'l60-tile-30', color: 'red', number: 3 },
+      { id: 'l60-tile-31', color: 'cyan', number: 3 },
+      { id: 'l60-tile-32', color: 'cyan' },
+      { id: 'l60-tile-33', color: 'joker', isJoker: true },
+      { id: 'l60-tile-34', color: 'blue' },
+      { id: 'l60-tile-35', color: 'red' },
+      { id: 'l60-tile-36', color: 'grey' },
+    ],
+  },
 ];
 
 const COLOR_HEX_MAP: Record<TileColor, string> = {
@@ -1437,6 +1956,22 @@ const COLOR_HEX_MAP: Record<TileColor, string> = {
   grey: '#ECEEF1',
 };
 
+const COLOR_SUBTLE_RGBA_MAP: Record<TileColor, string> = {
+  red: 'rgba(235, 88, 114, 0.48)',
+  yellow: 'rgba(255, 206, 84, 0.50)',
+  green: 'rgba(72, 207, 173, 0.48)',
+  blue: 'rgba(79, 193, 233, 0.48)',
+  purple: 'rgba(123, 121, 219, 0.48)',
+  orange: 'rgba(252, 110, 81, 0.48)',
+  pink: 'rgba(236, 135, 192, 0.48)',
+  cyan: 'rgba(59, 194, 165, 0.48)',
+  lime: 'rgba(160, 212, 104, 0.50)',
+  indigo: 'rgba(99, 102, 241, 0.48)',
+  amber: 'rgba(245, 158, 11, 0.48)',
+  joker: 'rgba(255, 170, 166, 0.48)',
+  grey: 'rgba(236, 238, 241, 0.48)',
+};
+
 const getSvgCornerRadius = (gridSize: number) => {
   if (gridSize === 2) return 18;
   if (gridSize === 3) return 14;
@@ -1450,25 +1985,99 @@ function getJokerAdjacentColors(
   tiles: Tile[],
   gridSize: number
 ): TileColor[] {
-  const row = Math.floor(index / gridSize);
-  const col = index % gridSize;
-  const neighbors = [
-    row > 0 ? (row - 1) * gridSize + col : null,
-    row < gridSize - 1 ? (row + 1) * gridSize + col : null,
-    col > 0 ? row * gridSize + (col - 1) : null,
-    col < gridSize - 1 ? row * gridSize + (col + 1) : null,
-  ];
+  // Find all connected joker / rainbow tiles in this connected cluster
+  const visitedJokers = new Set<number>();
+  const queue: number[] = [index];
+  visitedJokers.add(index);
 
-  const colors: TileColor[] = [];
-  for (const nIdx of neighbors) {
-    if (nIdx !== null) {
-      const c = tiles[nIdx].color;
-      if (c !== 'grey' && c !== 'joker' && !colors.includes(c)) {
-        colors.push(c);
+  while (queue.length > 0) {
+    const current = queue.shift()!;
+    const row = Math.floor(current / gridSize);
+    const col = current % gridSize;
+
+    const neighbors = [
+      row > 0 ? (row - 1) * gridSize + col : null,
+      row < gridSize - 1 ? (row + 1) * gridSize + col : null,
+      col > 0 ? row * gridSize + (col - 1) : null,
+      col < gridSize - 1 ? row * gridSize + (col + 1) : null,
+    ];
+
+    for (const nIdx of neighbors) {
+      if (nIdx !== null && !visitedJokers.has(nIdx)) {
+        const nTile = tiles[nIdx];
+        const isNeighborJoker = nTile.color === 'joker' || nTile.isJoker;
+        if (isNeighborJoker) {
+          visitedJokers.add(nIdx);
+          queue.push(nIdx);
+        }
       }
     }
   }
+
+  // Collect all non-grey, non-joker colors adjacent to ANY joker in this cluster
+  const colors: TileColor[] = [];
+  for (const jIdx of visitedJokers) {
+    const row = Math.floor(jIdx / gridSize);
+    const col = jIdx % gridSize;
+    const neighbors = [
+      row > 0 ? (row - 1) * gridSize + col : null,
+      row < gridSize - 1 ? (row + 1) * gridSize + col : null,
+      col > 0 ? row * gridSize + (col - 1) : null,
+      col < gridSize - 1 ? row * gridSize + (col + 1) : null,
+    ];
+
+    for (const nIdx of neighbors) {
+      if (nIdx !== null) {
+        const c = tiles[nIdx].color;
+        const isJokerNeighbor = c === 'joker' || tiles[nIdx].isJoker;
+        if (c !== 'grey' && !isJokerNeighbor && !colors.includes(c)) {
+          colors.push(c);
+        }
+      }
+    }
+  }
+
   return colors;
+}
+
+function getTileBackgroundStyle(
+  tile: Tile,
+  jokerAdjacentColors: TileColor[]
+): CSSProperties | undefined {
+  const isJoker = tile.color === 'joker' || tile.isJoker;
+
+  if (isJoker && jokerAdjacentColors.length > 0) {
+    const rainbowBase =
+      'linear-gradient(135deg, #FFAAA6 0%, #FFD3B5 25%, #DCEDC2 50%, #A8E6CF 75%, #C7CEEA 100%)';
+
+    if (jokerAdjacentColors.length === 1) {
+      const tint = COLOR_SUBTLE_RGBA_MAP[jokerAdjacentColors[0]];
+      return {
+        background: `linear-gradient(${tint}, ${tint}), ${rainbowBase}`,
+      };
+    }
+    if (jokerAdjacentColors.length === 2) {
+      const c1 = COLOR_SUBTLE_RGBA_MAP[jokerAdjacentColors[0]];
+      const c2 = COLOR_SUBTLE_RGBA_MAP[jokerAdjacentColors[1]];
+      const splitTint = `linear-gradient(135deg, ${c1} 0%, ${c1} 50%, ${c2} 50%, ${c2} 100%)`;
+      return {
+        background: `${splitTint}, ${rainbowBase}`,
+      };
+    }
+    // 3 or more colors: split evenly
+    const stops = jokerAdjacentColors.flatMap((c, cIdx) => {
+      const startPct = Math.round((cIdx / jokerAdjacentColors.length) * 100);
+      const endPct = Math.round(((cIdx + 1) / jokerAdjacentColors.length) * 100);
+      const rgba = COLOR_SUBTLE_RGBA_MAP[c];
+      return [`${rgba} ${startPct}%`, `${rgba} ${endPct}%`];
+    });
+    const multiTint = `linear-gradient(135deg, ${stops.join(', ')})`;
+    return {
+      background: `${multiTint}, ${rainbowBase}`,
+    };
+  }
+
+  return undefined;
 }
 
 function getConnectedSameColorComponent(
@@ -1917,11 +2526,19 @@ export default function App() {
     setHintToast(null);
   };
 
-  const getTileBgClasses = (tile: Tile, isSelected: boolean, isDisabled: boolean) => {
+  const getTileBgClasses = (
+    tile: Tile,
+    isSelected: boolean,
+    isDisabled: boolean,
+    hasCustomJokerBg: boolean = false
+  ) => {
     const isColored = tile.color !== 'grey';
     const hasNumber = tile.number !== undefined;
 
     if (isLevelCompleted) {
+      if (hasCustomJokerBg) {
+        return 'cursor-default shadow-xs';
+      }
       switch (tile.color) {
         case 'red':
           return 'bg-[#EB5872] cursor-default shadow-xs';
@@ -1984,6 +2601,12 @@ export default function App() {
     }
 
     if (isColored) {
+      if (hasCustomJokerBg) {
+        if (isSelected) {
+          return 'brightness-110 ring-3 ring-inset ring-white shadow-md cursor-pointer z-10';
+        }
+        return 'hover:brightness-105 active:brightness-95 shadow-xs cursor-pointer transition-all duration-150';
+      }
       if (isSelected) {
         switch (tile.color) {
           case 'red':
@@ -2342,6 +2965,9 @@ export default function App() {
                   const showCssBorder = hasChangedBoundary && !hasSvgBorder;
                   const isDisabled = isLevelCompleted || hasNumber;
 
+                  const customBgStyle = getTileBackgroundStyle(tile, jokerAdjacentColors);
+                  const hasCustomJokerBg = Boolean(customBgStyle);
+
                   const showTutorialFinger =
                     tutorialGuidance !== null && tutorialGuidance.fingerIndex === index;
 
@@ -2352,6 +2978,7 @@ export default function App() {
                       id={`grid-square-${tile.id}`}
                       disabled={isDisabled}
                       onClick={() => handleTileClick(index)}
+                      style={customBgStyle}
                       aria-label={`${tile.color} square${
                         hasNumber ? ` with number ${tile.number}` : ''
                       } at position ${index + 1}${isSelected ? ', selected' : ''}${
@@ -2364,7 +2991,7 @@ export default function App() {
                       } ${getTileBorderClass(
                         primaryColor,
                         showCssBorder
-                      )} ${getTileBgClasses(tile, isSelected, isDisabled)} ${
+                      )} ${getTileBgClasses(tile, isSelected, isDisabled, hasCustomJokerBg)} ${
                         showTutorialFinger ? 'ring-3 ring-inset ring-[#FA8231] shadow-md' : ''
                       }`}
                     >

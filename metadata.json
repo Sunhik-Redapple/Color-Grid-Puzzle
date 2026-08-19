@@ -1,6 +1,6 @@
 {
   "name": "Grid Puzzle",
-  "description": "An interactive grid puzzle game with 45 progressive levels featuring 1010-inspired pastel aesthetics, rounded squircle tiles, rainbow wildcard blocks with dynamic adaptive borders, level selection, and intuitive swap mechanics.",
+  "description": "An interactive grid puzzle game with 60 progressive levels featuring 1010-inspired pastel aesthetics, rounded squircle tiles, rainbow wildcard blocks with dynamic adaptive colors and borders, extra surplus block mechanics, level selection, and intuitive swap mechanics.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
