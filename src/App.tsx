@@ -4,7 +4,22 @@
  */
 
 import { useState, useEffect, type CSSProperties } from 'react';
-import { CheckCircle2, RotateCcw, ArrowRight, HelpCircle, X, Sparkles, Undo2, Lock, Play, Grid } from 'lucide-react';
+import {
+  CheckCircle2,
+  RotateCcw,
+  ArrowRight,
+  ArrowLeft,
+  HelpCircle,
+  X,
+  Sparkles,
+  Undo2,
+  Lock,
+  Play,
+  Grid,
+  Film,
+  AlertCircle,
+  RefreshCw,
+} from 'lucide-react';
 
 type TileColor = 'red' | 'yellow' | 'green' | 'blue' | 'purple' | 'orange' | 'pink' | 'cyan' | 'lime' | 'indigo' | 'amber' | 'joker' | 'grey';
 
@@ -13,6 +28,7 @@ interface Tile {
   color: TileColor;
   number?: number;
   isJoker?: boolean;
+  allowedColors?: TileColor[];
 }
 
 interface LevelConfig {
@@ -20,6 +36,7 @@ interface LevelConfig {
   title: string;
   gridSize: number;
   initialTiles: Tile[];
+  maxMoves?: number;
 }
 
 type ScreenMode = 'home' | 'level-select' | 'game';
@@ -1938,7 +1955,360 @@ const LEVELS: LevelConfig[] = [
       { id: 'l60-tile-36', color: 'grey' },
     ],
   },
+  {
+    id: 61,
+    title: 'Level 61',
+    gridSize: 3,
+    initialTiles: [
+      { id: 'l61-tile-1', color: 'red', number: 3, allowedColors: ['red', 'blue'] },
+      { id: 'l61-tile-2', color: 'grey' },
+      { id: 'l61-tile-3', color: 'blue' },
+      { id: 'l61-tile-4', color: 'grey' },
+      { id: 'l61-tile-5', color: 'yellow' },
+      { id: 'l61-tile-6', color: 'red' },
+      { id: 'l61-tile-7', color: 'green' },
+      { id: 'l61-tile-8', color: 'grey' },
+      { id: 'l61-tile-9', color: 'green', number: 3, allowedColors: ['yellow', 'green'] },
+    ],
+  },
+  {
+    id: 62,
+    title: 'Level 62',
+    gridSize: 3,
+    initialTiles: [
+      { id: 'l62-tile-1', color: 'red', number: 4, allowedColors: ['red', 'yellow', 'blue'] },
+      { id: 'l62-tile-2', color: 'grey' },
+      { id: 'l62-tile-3', color: 'green' },
+      { id: 'l62-tile-4', color: 'blue' },
+      { id: 'l62-tile-5', color: 'grey' },
+      { id: 'l62-tile-6', color: 'yellow' },
+      { id: 'l62-tile-7', color: 'purple' },
+      { id: 'l62-tile-8', color: 'red' },
+      { id: 'l62-tile-9', color: 'purple', number: 3, allowedColors: ['green', 'purple'] },
+    ],
+  },
+  {
+    id: 63,
+    title: 'Level 63',
+    gridSize: 4,
+    initialTiles: [
+      { id: 'l63-tile-1', color: 'purple', number: 4, allowedColors: ['purple', 'orange'] },
+      { id: 'l63-tile-2', color: 'grey' },
+      { id: 'l63-tile-3', color: 'cyan' },
+      { id: 'l63-tile-4', color: 'grey' },
+      { id: 'l63-tile-5', color: 'orange' },
+      { id: 'l63-tile-6', color: 'grey' },
+      { id: 'l63-tile-7', color: 'purple' },
+      { id: 'l63-tile-8', color: 'grey' },
+      { id: 'l63-tile-9', color: 'grey' },
+      { id: 'l63-tile-10', color: 'cyan' },
+      { id: 'l63-tile-11', color: 'grey' },
+      { id: 'l63-tile-12', color: 'orange' },
+      { id: 'l63-tile-13', color: 'grey' },
+      { id: 'l63-tile-14', color: 'purple' },
+      { id: 'l63-tile-15', color: 'grey' },
+      { id: 'l63-tile-16', color: 'cyan', number: 4, allowedColors: ['orange', 'cyan'] },
+    ],
+  },
+  {
+    id: 64,
+    title: 'Level 64',
+    gridSize: 4,
+    initialTiles: [
+      { id: 'l64-tile-1', color: 'blue' },
+      { id: 'l64-tile-2', color: 'grey' },
+      { id: 'l64-tile-3', color: 'pink' },
+      { id: 'l64-tile-4', color: 'pink', number: 3 },
+      { id: 'l64-tile-5', color: 'grey' },
+      { id: 'l64-tile-6', color: 'yellow', number: 3, allowedColors: ['blue', 'yellow'] },
+      { id: 'l64-tile-7', color: 'grey' },
+      { id: 'l64-tile-8', color: 'green' },
+      { id: 'l64-tile-9', color: 'yellow' },
+      { id: 'l64-tile-10', color: 'grey' },
+      { id: 'l64-tile-11', color: 'pink' },
+      { id: 'l64-tile-12', color: 'grey' },
+      { id: 'l64-tile-13', color: 'blue', number: 5, allowedColors: ['blue', 'pink', 'green'] },
+      { id: 'l64-tile-14', color: 'blue' },
+      { id: 'l64-tile-15', color: 'green' },
+      { id: 'l64-tile-16', color: 'grey' },
+    ],
+  },
+  {
+    id: 65,
+    title: 'Level 65',
+    gridSize: 4,
+    initialTiles: [
+      { id: 'l65-tile-1', color: 'red', number: 4, allowedColors: ['red', 'green'] },
+      { id: 'l65-tile-2', color: 'grey' },
+      { id: 'l65-tile-3', color: 'purple' },
+      { id: 'l65-tile-4', color: 'grey' },
+      { id: 'l65-tile-5', color: 'green' },
+      { id: 'l65-tile-6', color: 'grey' },
+      { id: 'l65-tile-7', color: 'red' },
+      { id: 'l65-tile-8', color: 'grey' },
+      { id: 'l65-tile-9', color: 'yellow' },
+      { id: 'l65-tile-10', color: 'joker', isJoker: true },
+      { id: 'l65-tile-11', color: 'grey' },
+      { id: 'l65-tile-12', color: 'red' },
+      { id: 'l65-tile-13', color: 'grey' },
+      { id: 'l65-tile-14', color: 'purple' },
+      { id: 'l65-tile-15', color: 'grey' },
+      { id: 'l65-tile-16', color: 'purple', number: 4, allowedColors: ['purple', 'yellow'] },
+    ],
+  },
+  {
+    id: 66,
+    title: 'Level 66',
+    gridSize: 5,
+    initialTiles: [
+      { id: 'l66-tile-1', color: 'cyan', number: 4, allowedColors: ['cyan', 'lime'] },
+      { id: 'l66-tile-2', color: 'grey' },
+      { id: 'l66-tile-3', color: 'cyan' },
+      { id: 'l66-tile-4', color: 'grey' },
+      { id: 'l66-tile-5', color: 'lime' },
+      { id: 'l66-tile-6', color: 'grey' },
+      { id: 'l66-tile-7', color: 'red' },
+      { id: 'l66-tile-8', color: 'grey' },
+      { id: 'l66-tile-9', color: 'purple' },
+      { id: 'l66-tile-10', color: 'grey' },
+      { id: 'l66-tile-11', color: 'lime' },
+      { id: 'l66-tile-12', color: 'grey' },
+      { id: 'l66-tile-13', color: 'red', number: 5, allowedColors: ['red', 'purple', 'amber'] },
+      { id: 'l66-tile-14', color: 'grey' },
+      { id: 'l66-tile-15', color: 'amber' },
+      { id: 'l66-tile-16', color: 'grey' },
+      { id: 'l66-tile-17', color: 'red' },
+      { id: 'l66-tile-18', color: 'grey' },
+      { id: 'l66-tile-19', color: 'cyan' },
+      { id: 'l66-tile-20', color: 'grey' },
+      { id: 'l66-tile-21', color: 'amber' },
+      { id: 'l66-tile-22', color: 'grey' },
+      { id: 'l66-tile-23', color: 'grey' },
+      { id: 'l66-tile-24', color: 'grey' },
+      { id: 'l66-tile-25', color: 'amber', number: 4, allowedColors: ['cyan', 'amber'] },
+    ],
+  },
+  {
+    id: 67,
+    title: 'Level 67',
+    gridSize: 5,
+    initialTiles: [
+      { id: 'l67-tile-1', color: 'grey' },
+      { id: 'l67-tile-2', color: 'blue', number: 3, allowedColors: ['blue', 'orange'] },
+      { id: 'l67-tile-3', color: 'pink' },
+      { id: 'l67-tile-4', color: 'grey' },
+      { id: 'l67-tile-5', color: 'orange' },
+      { id: 'l67-tile-6', color: 'pink' },
+      { id: 'l67-tile-7', color: 'grey' },
+      { id: 'l67-tile-8', color: 'green' },
+      { id: 'l67-tile-9', color: 'grey' },
+      { id: 'l67-tile-10', color: 'orange', number: 3, allowedColors: ['orange', 'green'] },
+      { id: 'l67-tile-11', color: 'grey' },
+      { id: 'l67-tile-12', color: 'blue' },
+      { id: 'l67-tile-13', color: 'grey' },
+      { id: 'l67-tile-14', color: 'green' },
+      { id: 'l67-tile-15', color: 'grey' },
+      { id: 'l67-tile-16', color: 'pink', number: 3, allowedColors: ['pink', 'blue'] },
+      { id: 'l67-tile-17', color: 'grey' },
+      { id: 'l67-tile-18', color: 'orange' },
+      { id: 'l67-tile-19', color: 'grey' },
+      { id: 'l67-tile-20', color: 'blue' },
+      { id: 'l67-tile-21', color: 'green' },
+      { id: 'l67-tile-22', color: 'grey' },
+      { id: 'l67-tile-23', color: 'grey' },
+      { id: 'l67-tile-24', color: 'green', number: 3, allowedColors: ['green', 'pink'] },
+      { id: 'l67-tile-25', color: 'grey' },
+    ],
+  },
+  {
+    id: 68,
+    title: 'Level 68',
+    gridSize: 5,
+    initialTiles: [
+      { id: 'l68-tile-1', color: 'grey' },
+      { id: 'l68-tile-2', color: 'blue' },
+      { id: 'l68-tile-3', color: 'red', number: 6, allowedColors: ['red', 'blue', 'yellow'] },
+      { id: 'l68-tile-4', color: 'grey' },
+      { id: 'l68-tile-5', color: 'green' },
+      { id: 'l68-tile-6', color: 'yellow' },
+      { id: 'l68-tile-7', color: 'grey' },
+      { id: 'l68-tile-8', color: 'joker', isJoker: true },
+      { id: 'l68-tile-9', color: 'grey' },
+      { id: 'l68-tile-10', color: 'red' },
+      { id: 'l68-tile-11', color: 'grey' },
+      { id: 'l68-tile-12', color: 'purple' },
+      { id: 'l68-tile-13', color: 'grey' },
+      { id: 'l68-tile-14', color: 'red' },
+      { id: 'l68-tile-15', color: 'grey' },
+      { id: 'l68-tile-16', color: 'green' },
+      { id: 'l68-tile-17', color: 'grey' },
+      { id: 'l68-tile-18', color: 'joker', isJoker: true },
+      { id: 'l68-tile-19', color: 'grey' },
+      { id: 'l68-tile-20', color: 'grey' },
+      { id: 'l68-tile-21', color: 'grey' },
+      { id: 'l68-tile-22', color: 'grey' },
+      { id: 'l68-tile-23', color: 'green', number: 4, allowedColors: ['green', 'purple'] },
+      { id: 'l68-tile-24', color: 'grey' },
+      { id: 'l68-tile-25', color: 'grey' },
+    ],
+  },
+  {
+    id: 69,
+    title: 'Level 69',
+    gridSize: 6,
+    initialTiles: [
+      { id: 'l69-tile-1', color: 'red', number: 4, allowedColors: ['red', 'yellow'] },
+      { id: 'l69-tile-2', color: 'grey' },
+      { id: 'l69-tile-3', color: 'yellow' },
+      { id: 'l69-tile-4', color: 'grey' },
+      { id: 'l69-tile-5', color: 'cyan' },
+      { id: 'l69-tile-6', color: 'blue', number: 4, allowedColors: ['blue', 'cyan'] },
+      { id: 'l69-tile-7', color: 'grey' },
+      { id: 'l69-tile-8', color: 'red' },
+      { id: 'l69-tile-9', color: 'grey' },
+      { id: 'l69-tile-10', color: 'blue' },
+      { id: 'l69-tile-11', color: 'grey' },
+      { id: 'l69-tile-12', color: 'cyan' },
+      { id: 'l69-tile-13', color: 'yellow' },
+      { id: 'l69-tile-14', color: 'grey' },
+      { id: 'l69-tile-15', color: 'grey' },
+      { id: 'l69-tile-16', color: 'red', number: 5, allowedColors: ['red', 'blue', 'purple', 'green'] },
+      { id: 'l69-tile-17', color: 'grey' },
+      { id: 'l69-tile-18', color: 'blue' },
+      { id: 'l69-tile-19', color: 'purple' },
+      { id: 'l69-tile-20', color: 'grey' },
+      { id: 'l69-tile-21', color: 'red' },
+      { id: 'l69-tile-22', color: 'grey' },
+      { id: 'l69-tile-23', color: 'green' },
+      { id: 'l69-tile-24', color: 'grey' },
+      { id: 'l69-tile-25', color: 'pink' },
+      { id: 'l69-tile-26', color: 'grey' },
+      { id: 'l69-tile-27', color: 'purple' },
+      { id: 'l69-tile-28', color: 'grey' },
+      { id: 'l69-tile-29', color: 'orange' },
+      { id: 'l69-tile-30', color: 'grey' },
+      { id: 'l69-tile-31', color: 'purple', number: 4, allowedColors: ['purple', 'pink'] },
+      { id: 'l69-tile-32', color: 'grey' },
+      { id: 'l69-tile-33', color: 'pink' },
+      { id: 'l69-tile-34', color: 'grey' },
+      { id: 'l69-tile-35', color: 'orange' },
+      { id: 'l69-tile-36', color: 'green', number: 4, allowedColors: ['green', 'orange'] },
+    ],
+  },
+  {
+    id: 70,
+    title: 'Level 70',
+    gridSize: 6,
+    initialTiles: [
+      { id: 'l70-tile-1', color: 'grey' },
+      { id: 'l70-tile-2', color: 'orange' },
+      { id: 'l70-tile-3', color: 'grey' },
+      { id: 'l70-tile-4', color: 'grey' },
+      { id: 'l70-tile-5', color: 'cyan' },
+      { id: 'l70-tile-6', color: 'grey' },
+      { id: 'l70-tile-7', color: 'yellow' },
+      { id: 'l70-tile-8', color: 'red', number: 6, allowedColors: ['red', 'orange', 'yellow'] },
+      { id: 'l70-tile-9', color: 'red' },
+      { id: 'l70-tile-10', color: 'blue' },
+      { id: 'l70-tile-11', color: 'green', number: 6, allowedColors: ['green', 'cyan', 'blue'] },
+      { id: 'l70-tile-12', color: 'green' },
+      { id: 'l70-tile-13', color: 'grey' },
+      { id: 'l70-tile-14', color: 'orange' },
+      { id: 'l70-tile-15', color: 'joker', isJoker: true },
+      { id: 'l70-tile-16', color: 'grey' },
+      { id: 'l70-tile-17', color: 'cyan' },
+      { id: 'l70-tile-18', color: 'grey' },
+      { id: 'l70-tile-19', color: 'grey' },
+      { id: 'l70-tile-20', color: 'pink' },
+      { id: 'l70-tile-21', color: 'grey' },
+      { id: 'l70-tile-22', color: 'joker', isJoker: true },
+      { id: 'l70-tile-23', color: 'blue' },
+      { id: 'l70-tile-24', color: 'grey' },
+      { id: 'l70-tile-25', color: 'purple' },
+      { id: 'l70-tile-26', color: 'purple', number: 6, allowedColors: ['purple', 'pink', 'red'] },
+      { id: 'l70-tile-27', color: 'pink' },
+      { id: 'l70-tile-28', color: 'purple' },
+      { id: 'l70-tile-29', color: 'blue', number: 6, allowedColors: ['blue', 'purple', 'cyan'] },
+      { id: 'l70-tile-30', color: 'cyan' },
+      { id: 'l70-tile-31', color: 'grey' },
+      { id: 'l70-tile-32', color: 'red' },
+      { id: 'l70-tile-33', color: 'grey' },
+      { id: 'l70-tile-34', color: 'grey' },
+      { id: 'l70-tile-35', color: 'blue' },
+      { id: 'l70-tile-36', color: 'grey' },
+    ],
+  },
 ];
+
+// Move limits starting from Level 5, adjusted progressively with difficulty
+const LEVEL_MAX_MOVES: Record<number, number> = {
+  5: 10,
+  6: 10,
+  7: 10,
+  8: 10,
+  9: 10,
+  10: 12,
+  11: 10,
+  12: 12,
+  13: 12,
+  14: 12,
+  15: 12,
+  16: 14,
+  17: 12,
+  18: 14,
+  19: 12,
+  20: 14,
+  21: 12,
+  22: 14,
+  23: 12,
+  24: 14,
+  25: 12,
+  26: 14,
+  27: 14,
+  28: 14,
+  29: 12,
+  30: 15,
+  31: 12,
+  32: 12,
+  33: 14,
+  34: 12,
+  35: 14,
+  36: 15,
+  37: 14,
+  38: 15,
+  39: 14,
+  40: 16,
+  41: 14,
+  42: 15,
+  43: 14,
+  44: 16,
+  45: 18,
+  46: 10,
+  47: 10,
+  48: 10,
+  49: 12,
+  50: 14,
+  51: 12,
+  52: 12,
+  53: 12,
+  54: 12,
+  55: 15,
+  56: 16,
+  57: 15,
+  58: 16,
+  59: 16,
+  60: 18,
+  61: 10,
+  62: 12,
+  63: 14,
+  64: 14,
+  65: 15,
+  66: 16,
+  67: 18,
+  68: 18,
+  69: 22,
+  70: 24,
+};
 
 const COLOR_HEX_MAP: Record<TileColor, string> = {
   red: '#EB5872',
@@ -2044,6 +2414,26 @@ function getTileBackgroundStyle(
   tile: Tile,
   jokerAdjacentColors: TileColor[]
 ): CSSProperties | undefined {
+  // Multi-coloured number block (anchor) split styling
+  if (tile.allowedColors && tile.allowedColors.length > 1) {
+    if (tile.allowedColors.length === 2) {
+      const c1 = COLOR_HEX_MAP[tile.allowedColors[0]];
+      const c2 = COLOR_HEX_MAP[tile.allowedColors[1]];
+      return {
+        background: `linear-gradient(135deg, ${c1} 0%, ${c1} 50%, ${c2} 50%, ${c2} 100%)`,
+      };
+    }
+    const stops = tile.allowedColors.flatMap((c, cIdx) => {
+      const startPct = Math.round((cIdx / tile.allowedColors!.length) * 100);
+      const endPct = Math.round(((cIdx + 1) / tile.allowedColors!.length) * 100);
+      const hex = COLOR_HEX_MAP[c];
+      return [`${hex} ${startPct}%`, `${hex} ${endPct}%`];
+    });
+    return {
+      background: `linear-gradient(135deg, ${stops.join(', ')})`,
+    };
+  }
+
   const isJoker = tile.color === 'joker' || tile.isJoker;
 
   if (isJoker && jokerAdjacentColors.length > 0) {
@@ -2078,6 +2468,108 @@ function getTileBackgroundStyle(
   }
 
   return undefined;
+}
+
+function getConnectedComponentForAnchor(
+  anchorIdx: number,
+  tiles: Tile[],
+  gridSize: number
+): { indices: number[]; colors: TileColor[] } | null {
+  const anchor = tiles[anchorIdx];
+  const targetSize = anchor.number;
+  if (!targetSize) return null;
+
+  const allowedColors: TileColor[] =
+    anchor.allowedColors && anchor.allowedColors.length > 0
+      ? anchor.allowedColors
+      : [anchor.color];
+
+  // 1. Check each allowed color individually (single color group + jokers)
+  for (const color of allowedColors) {
+    const visited = new Set<number>();
+    const queue: number[] = [anchorIdx];
+    visited.add(anchorIdx);
+
+    while (queue.length > 0) {
+      const current = queue.shift()!;
+      const r = Math.floor(current / gridSize);
+      const c = current % gridSize;
+      const neighbors = [
+        r > 0 ? (r - 1) * gridSize + c : null,
+        r < gridSize - 1 ? (r + 1) * gridSize + c : null,
+        c > 0 ? r * gridSize + (c - 1) : null,
+        c < gridSize - 1 ? r * gridSize + (c + 1) : null,
+      ];
+
+      for (const nIdx of neighbors) {
+        if (nIdx !== null && !visited.has(nIdx)) {
+          const nTile = tiles[nIdx];
+          const isMatching =
+            nTile.color === color ||
+            (nTile.allowedColors && nTile.allowedColors.includes(color));
+          const isJoker = nTile.color === 'joker' || nTile.isJoker === true;
+          if (isMatching || isJoker) {
+            visited.add(nIdx);
+            queue.push(nIdx);
+          }
+        }
+      }
+    }
+
+    if (visited.size === targetSize) {
+      return {
+        indices: Array.from(visited),
+        colors: [color],
+      };
+    }
+  }
+
+  // 2. If multi-colored, check combined allowed colors component
+  if (allowedColors.length > 1) {
+    const visited = new Set<number>();
+    const queue: number[] = [anchorIdx];
+    visited.add(anchorIdx);
+    const presentColors = new Set<TileColor>();
+
+    while (queue.length > 0) {
+      const current = queue.shift()!;
+      const r = Math.floor(current / gridSize);
+      const c = current % gridSize;
+      const neighbors = [
+        r > 0 ? (r - 1) * gridSize + c : null,
+        r < gridSize - 1 ? (r + 1) * gridSize + c : null,
+        c > 0 ? r * gridSize + (c - 1) : null,
+        c < gridSize - 1 ? r * gridSize + (c + 1) : null,
+      ];
+
+      for (const nIdx of neighbors) {
+        if (nIdx !== null && !visited.has(nIdx)) {
+          const nTile = tiles[nIdx];
+          const isAllowed =
+            allowedColors.includes(nTile.color) ||
+            (nTile.allowedColors &&
+              nTile.allowedColors.some((ac) => allowedColors.includes(ac)));
+          const isJoker = nTile.color === 'joker' || nTile.isJoker === true;
+          if (isAllowed || isJoker) {
+            visited.add(nIdx);
+            queue.push(nIdx);
+            if (nTile.color !== 'grey' && nTile.color !== 'joker' && !nTile.isJoker) {
+              presentColors.add(nTile.color);
+            }
+          }
+        }
+      }
+    }
+
+    if (visited.size === targetSize) {
+      return {
+        indices: Array.from(visited),
+        colors: presentColors.size > 0 ? Array.from(presentColors) : allowedColors,
+      };
+    }
+  }
+
+  return null;
 }
 
 function getConnectedSameColorComponent(
@@ -2170,7 +2662,7 @@ function getTutorialGuidance(
   selectedIndex: number | null,
   isLevelCompleted: boolean
 ): TutorialGuidance | null {
-  if (levelId > 3 && levelId !== 31) return null;
+  if (levelId > 3 && levelId !== 31 && levelId !== 61) return null;
 
   // Level 1: Basic Movement
   if (levelId === 1) {
@@ -2380,6 +2872,44 @@ function getTutorialGuidance(
     };
   }
 
+  // Level 61: Introduction to the Multi-Coloured Number Block
+  if (levelId === 61) {
+    if (isLevelCompleted) {
+      return {
+        mainText: 'LEVEL 61 COMPLETED!',
+        subText: 'MULTI-COLOURED NUMBER BLOCKS MASTERED!',
+        fingerIndex: null,
+      };
+    }
+
+    const anchor1Comp = getConnectedComponentForAnchor(0, tiles, 3);
+    const isAnchor1Done = anchor1Comp !== null;
+    const anchor2Comp = getConnectedComponentForAnchor(8, tiles, 3);
+    const isAnchor2Done = anchor2Comp !== null;
+
+    if (!isAnchor1Done) {
+      if (selectedIndex === null) {
+        const movableTarget = tiles.findIndex(
+          (t, i) => (t.color === 'red' || t.color === 'blue') && t.number === undefined && i !== 1 && i !== 3
+        );
+        return {
+          mainText: 'MULTI-COLOURED NUMBER BLOCK [3]',
+          subText: 'ACCEPTS RED OR BLUE BLOCKS TO COMPLETE [3]',
+          fingerIndex: movableTarget !== -1 ? movableTarget : 4,
+        };
+      } else {
+        const emptyTarget = tiles[1].color === 'grey' ? 1 : tiles[3].color === 'grey' ? 3 : 2;
+        return {
+          mainText: 'PLACE ADJACENT TO RED/BLUE [3]',
+          subText: 'CONNECT RED & BLUE BLOCKS TO SATISFY ANCHOR',
+          fingerIndex: emptyTarget,
+        };
+      }
+    }
+
+    return null;
+  }
+
   return null;
 }
 
@@ -2395,6 +2925,36 @@ export default function App() {
   const [showHowToPlayModal, setShowHowToPlayModal] = useState<boolean>(false);
   const [hintToast, setHintToast] = useState<string | null>(null);
 
+  // Moves management (Level 5+)
+  const [movesLeft, setMovesLeft] = useState<number | null>(
+    LEVELS[0].maxMoves ?? LEVEL_MAX_MOVES[LEVELS[0].id] ?? null
+  );
+  const [isWatchingAd, setIsWatchingAd] = useState<boolean>(false);
+  const [adCountdown, setAdCountdown] = useState<number>(3);
+
+  // Undo moves management (Level 5+)
+  const [undoCount, setUndoCount] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem('grid_puzzle_undo_count');
+      return saved !== null ? parseInt(saved, 10) : 3;
+    } catch {
+      return 3;
+    }
+  });
+  const [moveHistory, setMoveHistory] = useState<Array<{ tiles: Tile[]; movesLeft: number | null }>>([]);
+  const [showUndoAdModal, setShowUndoAdModal] = useState<boolean>(false);
+  const [isWatchingUndoAd, setIsWatchingUndoAd] = useState<boolean>(false);
+  const [undoAdCountdown, setUndoAdCountdown] = useState<number>(3);
+
+  const updateUndoCount = (val: number) => {
+    setUndoCount(val);
+    try {
+      localStorage.setItem('grid_puzzle_undo_count', String(val));
+    } catch {
+      // ignore
+    }
+  };
+
   const showToast = (message: string) => {
     setHintToast(message);
     setTimeout(() => {
@@ -2402,11 +2962,81 @@ export default function App() {
     }, 2800);
   };
 
+  const handleWatchAdForMoves = () => {
+    if (isWatchingAd) return;
+    setIsWatchingAd(true);
+    setAdCountdown(3);
+
+    let count = 3;
+    const interval = setInterval(() => {
+      count -= 1;
+      setAdCountdown(count);
+      if (count <= 0) {
+        clearInterval(interval);
+        setIsWatchingAd(false);
+        setMovesLeft((current) => (current ?? 0) + 5);
+        showToast('🎉 +5 Extra Moves Added!');
+      }
+    }, 850);
+  };
+
+  const handleWatchAdForUndos = () => {
+    if (isWatchingUndoAd) return;
+    setIsWatchingUndoAd(true);
+    setUndoAdCountdown(3);
+
+    let count = 3;
+    const interval = setInterval(() => {
+      count -= 1;
+      setUndoAdCountdown(count);
+      if (count <= 0) {
+        clearInterval(interval);
+        setIsWatchingUndoAd(false);
+        setShowUndoAdModal(false);
+        const updated = (undoCount || 0) + 3;
+        updateUndoCount(updated);
+      }
+    }, 850);
+  };
+
+  const handleUndo = () => {
+    if (currentLevel.id < 5) {
+      return;
+    }
+
+    if (isLevelCompleted) return;
+
+    if (undoCount <= 0) {
+      setShowUndoAdModal(true);
+      return;
+    }
+
+    if (moveHistory.length === 0) {
+      return;
+    }
+
+    const prevSnapshot = moveHistory[moveHistory.length - 1];
+    setMoveHistory((prev) => prev.slice(0, -1));
+    setTiles(prevSnapshot.tiles);
+    setMovesLeft(prevSnapshot.movesLeft);
+    setSelectedIndex(null);
+
+    const updated = Math.max(0, undoCount - 1);
+    updateUndoCount(updated);
+  };
+
   const switchLevel = (levelIndex: number) => {
     setCurrentLevelIndex(levelIndex);
     setTiles(LEVELS[levelIndex].initialTiles);
     setSelectedIndex(null);
     setHintToast(null);
+    setIsWatchingAd(false);
+    setShowUndoAdModal(false);
+    setIsWatchingUndoAd(false);
+    setMoveHistory([]);
+    const defaultMoves =
+      LEVELS[levelIndex].maxMoves ?? LEVEL_MAX_MOVES[LEVELS[levelIndex].id] ?? null;
+    setMovesLeft(defaultMoves);
   };
 
   const handleStartPlay = () => {
@@ -2430,22 +3060,20 @@ export default function App() {
   let allNumberedSatisfied = numberedTiles.length > 0;
 
   numberedTiles.forEach(({ tile, idx }) => {
-    const targetSize = tile.number!;
-    const connectedIndices = getConnectedSameColorComponent(
+    const result = getConnectedComponentForAnchor(
       idx,
       tiles,
       currentLevel.gridSize
     );
 
     // Only consider the set complete if the connected component EXACTLY equals targetSize (no more and no less)
-    if (connectedIndices.length === targetSize) {
-      connectedIndices.forEach((cIdx) => {
+    if (result) {
+      result.indices.forEach((cIdx) => {
         const cTile = tiles[cIdx];
         changedBoundaryTileIds.add(cTile.id);
         const existing = completedTileSetColors.get(cTile.id) || [];
-        if (!existing.includes(tile.color)) {
-          completedTileSetColors.set(cTile.id, [...existing, tile.color]);
-        }
+        const combined = Array.from(new Set([...existing, ...result.colors]));
+        completedTileSetColors.set(cTile.id, combined);
       });
     } else {
       allNumberedSatisfied = false;
@@ -2453,6 +3081,7 @@ export default function App() {
   });
 
   const isLevelCompleted = allNumberedSatisfied && changedBoundaryTileIds.size > 0;
+  const isOutOfMoves = movesLeft !== null && movesLeft <= 0 && !isLevelCompleted;
   const isTutorialLevel = currentLevel.id <= 3;
   const tutorialGuidance = getTutorialGuidance(
     currentLevel.id,
@@ -2477,8 +3106,8 @@ export default function App() {
   }, [isLevelCompleted, currentLevel.id, unlockedLevelsMax]);
 
   const handleTileClick = (index: number) => {
-    // When level is completed, prevent interaction
-    if (isLevelCompleted) {
+    // When level is completed or out of moves, prevent interaction
+    if (isLevelCompleted || (movesLeft !== null && movesLeft <= 0)) {
       return;
     }
 
@@ -2510,6 +3139,9 @@ export default function App() {
       return;
     }
 
+    // Record history snapshot for undo
+    setMoveHistory((prev) => [...prev, { tiles: [...tiles], movesLeft }]);
+
     // Swapping selected colored square with clicked grey square
     const nextTiles = [...tiles];
     const temp = nextTiles[selectedIndex];
@@ -2518,12 +3150,24 @@ export default function App() {
 
     setTiles(nextTiles);
     setSelectedIndex(null);
+
+    // Decrement remaining moves if level has a move limit
+    if (movesLeft !== null) {
+      setMovesLeft((prev) => (prev !== null ? Math.max(0, prev - 1) : null));
+    }
   };
 
   const handleReset = () => {
     setTiles(currentLevel.initialTiles);
     setSelectedIndex(null);
     setHintToast(null);
+    setIsWatchingAd(false);
+    setShowUndoAdModal(false);
+    setIsWatchingUndoAd(false);
+    setMoveHistory([]);
+    const defaultMoves =
+      currentLevel.maxMoves ?? LEVEL_MAX_MOVES[currentLevel.id] ?? null;
+    setMovesLeft(defaultMoves);
   };
 
   const getTileBgClasses = (
@@ -2570,6 +3214,9 @@ export default function App() {
     }
 
     if (hasNumber) {
+      if (hasCustomJokerBg) {
+        return 'cursor-not-allowed shadow-xs';
+      }
       switch (tile.color) {
         case 'red':
           return 'bg-[#EB5872] cursor-not-allowed shadow-xs';
@@ -2708,8 +3355,11 @@ export default function App() {
     }
   };
 
-  const getTileNumberTextClass = (color: TileColor) => {
-    switch (color) {
+  const getTileNumberTextClass = (tile: Tile) => {
+    if (tile.allowedColors && tile.allowedColors.length > 1) {
+      return 'text-white drop-shadow-[0_1.5px_2.5px_rgba(0,0,0,0.85)] font-black';
+    }
+    switch (tile.color) {
       case 'yellow':
       case 'lime':
       case 'amber':
@@ -2876,8 +3526,8 @@ export default function App() {
       {screen === 'game' && (
         <div className="w-full max-w-[min(92vw,72vh,420px)] flex flex-col items-center justify-between flex-1 min-h-[92vh] py-2 sm:py-4">
           
-          {/* Top Header Bar: Back Button (Left), Level Title (Middle), Reset Button (Right) */}
-          <header id="app-top-bar" className="w-full flex items-center justify-between px-1 pt-1 pb-2">
+          {/* Top Header Bar: Back Button (Left), Level Title + Moves UI (Middle), Reset Button (Right) */}
+          <header id="app-top-bar" className="w-full flex items-center justify-between px-1 pt-1 pb-1">
             {/* Back button on top left to return to level selection */}
             <button
               type="button"
@@ -2886,13 +3536,32 @@ export default function App() {
               aria-label="Level Selection"
               className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#94A3B8] hover:bg-[#64748B] text-white flex items-center justify-center shadow-xs cursor-pointer active:scale-95 transition-all"
             >
-              <Undo2 className="w-6 h-6 sm:w-7 sm:h-7 stroke-[2.5]" />
+              <ArrowLeft className="w-6 h-6 sm:w-7 sm:h-7 stroke-[2.5]" />
             </button>
 
-            {/* Level Number in middle */}
-            <h1 id="level-title-display" className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#0F172A] tracking-tight">
-              {currentLevel.title}
-            </h1>
+            {/* Level Number and Moves Counter directly below it */}
+            <div className="flex flex-col items-center justify-center gap-1.5 sm:gap-2">
+              <h1 id="level-title-display" className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#0F172A] tracking-tight leading-none">
+                {currentLevel.title}
+              </h1>
+
+              {movesLeft !== null && (
+                <div
+                  id="moves-remaining-badge"
+                  className={`flex items-center gap-2 px-4 sm:px-5 py-1.5 sm:py-2 rounded-2xl text-sm sm:text-base font-black tracking-wide shadow-sm border transition-all ${
+                    movesLeft <= 2
+                      ? 'bg-rose-500 border-rose-600 text-white animate-pulse shadow-rose-200 scale-105'
+                      : movesLeft <= 4
+                      ? 'bg-[#FA8231] border-amber-600 text-white shadow-amber-200'
+                      : 'bg-[#ECEEF1] border-slate-300/80 text-[#0F172A]'
+                  }`}
+                >
+                  <span className="text-xs sm:text-sm opacity-80 uppercase tracking-wider font-extrabold">Moves</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-current opacity-60"></span>
+                  <span className="text-lg sm:text-xl font-black tabular-nums leading-none">{movesLeft}</span>
+                </div>
+              )}
+            </div>
 
             {/* Reset Button on top right */}
             <button
@@ -3060,7 +3729,7 @@ export default function App() {
                           id={`tile-number-${tile.number}`}
                           className={`absolute inset-0 flex items-center justify-center select-none leading-none pointer-events-none ${getNumberSizeClass(
                             currentLevel.gridSize
-                          )} ${getTileNumberTextClass(tile.color)}`}
+                          )} ${getTileNumberTextClass(tile)}`}
                         >
                           {tile.number}
                         </span>
@@ -3137,7 +3806,31 @@ export default function App() {
                 )}
               </div>
             ) : (
-              <div className="flex items-center justify-end w-full">
+              <div className="flex items-center justify-between w-full">
+                {currentLevel.id >= 5 ? (
+                  <button
+                    type="button"
+                    id="undo-move-button"
+                    onClick={handleUndo}
+                    className="flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-800 font-extrabold text-xs sm:text-sm border border-slate-200 shadow-2xs active:scale-95 cursor-pointer transition-all"
+                    aria-label={`Undo last move. ${undoCount} undos left.`}
+                  >
+                    <Undo2 className="w-4 h-4 text-[#FA8231] stroke-[2.5]" />
+                    <span>Undo</span>
+                    <span
+                      className={`px-1.5 py-0.5 rounded-md text-[10px] sm:text-[11px] font-black leading-none ${
+                        undoCount > 0
+                          ? 'bg-amber-100 text-amber-800'
+                          : 'bg-rose-100 text-rose-700'
+                      }`}
+                    >
+                      {undoCount}
+                    </span>
+                  </button>
+                ) : (
+                  <div />
+                )}
+
                 <button
                   type="button"
                   id="how-to-play-toggle-button"
@@ -3227,6 +3920,36 @@ export default function App() {
                   The soothing <strong>Rainbow block</strong> acts as a universal wildcard and can connect with <strong>any color</strong> to help complete required group sizes.
                 </p>
               </div>
+
+              <div className="bg-[#F8F9FB] p-3.5 rounded-2xl border border-[#ECEEF1] flex flex-col gap-1">
+                <span className="font-extrabold text-slate-800 flex items-center gap-2 text-xs uppercase tracking-wide">
+                  <span className="w-5 h-5 rounded-full bg-[#FA8231] text-white text-[10px] flex items-center justify-center font-black">6</span>
+                  Limited Moves (Level 5+)
+                </span>
+                <p className="text-xs text-slate-600">
+                  Starting from Level 5, you have a <strong>limited number of moves</strong>. If you run out of moves, you can restart the level or watch a quick ad to get <strong>+5 extra moves</strong>!
+                </p>
+              </div>
+
+              <div className="bg-[#F8F9FB] p-3.5 rounded-2xl border border-[#ECEEF1] flex flex-col gap-1">
+                <span className="font-extrabold text-slate-800 flex items-center gap-2 text-xs uppercase tracking-wide">
+                  <span className="w-5 h-5 rounded-full bg-[#FA8231] text-white text-[10px] flex items-center justify-center font-black">7</span>
+                  Undo Moves (Level 5+)
+                </span>
+                <p className="text-xs text-slate-600">
+                  Made a wrong move? Tap the <strong>Undo</strong> button to reverse your last move and restore your board and move count. You start with <strong>3 free Undos</strong>, and can watch an ad to get <strong>+3 more</strong> when empty!
+                </p>
+              </div>
+
+              <div className="bg-[#F8F9FB] p-3.5 rounded-2xl border border-[#ECEEF1] flex flex-col gap-1">
+                <span className="font-extrabold text-slate-800 flex items-center gap-2 text-xs uppercase tracking-wide">
+                  <span className="w-5 h-5 rounded-full bg-[linear-gradient(135deg,#EB5872_0%,#EB5872_50%,#4FC1E9_50%,#4FC1E9_100%)] text-white text-[10px] flex items-center justify-center font-black">8</span>
+                  Multi-Coloured Number Blocks (Level 61+)
+                </span>
+                <p className="text-xs text-slate-600">
+                  Numbered anchor blocks with <strong>two or more colors</strong> accept <strong>any of their listed colors</strong> to form connected sets! Place blocks of any shown color next to the multi-coloured anchor to match the required number and complete the set.
+                </p>
+              </div>
             </div>
 
             <button
@@ -3236,6 +3959,132 @@ export default function App() {
             >
               GOT IT, LET'S PLAY!
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Out of Moves Game Over Modal */}
+      {isOutOfMoves && (
+        <div
+          id="out-of-moves-modal"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/65 backdrop-blur-xs animate-in fade-in"
+        >
+          <div className="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-7 shadow-2xl border border-slate-100 flex flex-col items-center gap-4 text-center animate-in zoom-in-95">
+            {/* Warning / Out of Moves Badge Icon */}
+            <div className="w-16 h-16 rounded-3xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-500 shadow-xs">
+              <AlertCircle className="w-9 h-9 stroke-[2.5]" />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight">Out of Moves!</h2>
+              <p className="text-xs sm:text-sm font-medium text-slate-500">
+                You used all moves for <span className="font-bold text-slate-700">{currentLevel.title}</span>.
+              </p>
+            </div>
+
+            {/* Action Buttons: Watch Ad for +5 Moves OR Restart Level */}
+            <div className="flex flex-col gap-2.5 w-full pt-2">
+              {/* Watch Ad for +5 Moves */}
+              <button
+                type="button"
+                id="watch-ad-for-moves-button"
+                onClick={handleWatchAdForMoves}
+                disabled={isWatchingAd}
+                className="w-full py-3.5 px-4 rounded-2xl bg-[#FA8231] hover:bg-[#E67325] text-white font-extrabold text-sm sm:text-base shadow-md flex items-center justify-center gap-2.5 cursor-pointer active:scale-95 transition-all disabled:opacity-85"
+              >
+                {isWatchingAd ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    <span>Watching Ad ({adCountdown}s)...</span>
+                  </>
+                ) : (
+                  <>
+                    <Film className="w-4 h-4 fill-white/20" />
+                    <span>Watch Ad (+5 Moves)</span>
+                  </>
+                )}
+              </button>
+
+              {/* Restart Game */}
+              <button
+                type="button"
+                id="restart-level-out-of-moves-button"
+                onClick={handleReset}
+                disabled={isWatchingAd}
+                className="w-full py-3.5 px-4 rounded-2xl bg-[#ECEEF1] hover:bg-[#DFE2E8] text-[#0F172A] font-extrabold text-sm sm:text-base shadow-xs flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all"
+              >
+                <RotateCcw className="w-4 h-4 text-slate-600 stroke-[2.5]" />
+                <span>Restart Level</span>
+              </button>
+
+              {/* Return to Level Select */}
+              <button
+                type="button"
+                id="back-to-levels-out-of-moves-button"
+                onClick={() => setScreen('level-select')}
+                disabled={isWatchingAd}
+                className="w-full py-1.5 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+              >
+                Back to Levels
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Out of Undos Ad Modal (Watch Ad vs Skip) */}
+      {showUndoAdModal && (
+        <div
+          id="undo-ad-modal"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/65 backdrop-blur-xs animate-in fade-in"
+        >
+          <div className="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-7 shadow-2xl border border-slate-100 flex flex-col items-center gap-4 text-center animate-in zoom-in-95">
+            {/* Undo Badge Icon */}
+            <div className="w-16 h-16 rounded-3xl bg-amber-50 border border-amber-100 flex items-center justify-center text-[#FA8231] shadow-xs">
+              <Undo2 className="w-9 h-9 stroke-[2.5]" />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <h2 className="text-2xl font-black text-slate-900 tracking-tight">Need More Undos?</h2>
+              <p className="text-xs sm:text-sm font-medium text-slate-500">
+                You have used all your free Undo moves. Watch a quick ad to receive <span className="font-bold text-slate-800">+3 Extra Undos</span>!
+              </p>
+            </div>
+
+            {/* Action Buttons: Watch Ad for +3 Undos OR Skip */}
+            <div className="flex flex-col gap-2.5 w-full pt-2">
+              <button
+                type="button"
+                id="watch-ad-for-undos-button"
+                onClick={handleWatchAdForUndos}
+                disabled={isWatchingUndoAd}
+                className="w-full py-3.5 px-4 rounded-2xl bg-[#FA8231] hover:bg-[#E67325] text-white font-extrabold text-sm sm:text-base shadow-md flex items-center justify-center gap-2.5 cursor-pointer active:scale-95 transition-all disabled:opacity-85"
+              >
+                {isWatchingUndoAd ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    <span>Watching Ad ({undoAdCountdown}s)...</span>
+                  </>
+                ) : (
+                  <>
+                    <Film className="w-4 h-4 fill-white/20" />
+                    <span>Watch Ad (+3 Undos)</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                type="button"
+                id="skip-undo-ad-button"
+                onClick={() => {
+                  if (!isWatchingUndoAd) setShowUndoAdModal(false);
+                }}
+                disabled={isWatchingUndoAd}
+                className="w-full py-3 px-4 rounded-2xl bg-[#ECEEF1] hover:bg-[#DFE2E8] text-[#0F172A] font-extrabold text-sm shadow-xs flex items-center justify-center cursor-pointer active:scale-95 transition-all"
+              >
+                Skip
+              </button>
+            </div>
           </div>
         </div>
       )}
