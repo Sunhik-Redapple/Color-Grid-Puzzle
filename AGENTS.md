@@ -22,4 +22,8 @@
   - Numbered anchor blocks can specify two or more allowed colors (e.g. `allowedColors: ['red', 'blue']`).
   - Players can place any of the specified color blocks adjacent to the multi-coloured anchor to form connected orthogonal sets matching the anchor's target number.
   - Visually styled with clean diagonal split gradients representing the accepted colors, crisp high-contrast centered typography, and multi-colored illuminated border glows upon completion.
+- **Frozen Blocks (Ice & Thaw) (Level 101+)**:
+  - Certain colored blocks start encased in ice (`isFrozen: true`) and cannot be moved or swapped.
+  - When a player completes an adjacent color group (or a group containing the frozen tile), heat from the completed set melts the ice, thawing the block and unlocking it for normal movement and swapping.
+  - Visually rendered with a minimalist frosted ice overlay matching the game's pastel squircle art style: a translucent frosted wash, a crisp geometric inner white rim with subtle top-left glint, a clean centered white snowflake crystal glyph, and a gentle locked wobble on tap. Upon thawing, an elegant warm amber pulse dissolves the frost cleanly.
 

@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect, type CSSProperties } from 'react';
+import { useState, useEffect, useRef, type CSSProperties } from 'react';
+import confetti from 'canvas-confetti';
+import { motion, AnimatePresence } from 'motion/react';
 import {
   CheckCircle2,
   RotateCcw,
@@ -19,6 +21,7 @@ import {
   Film,
   AlertCircle,
   RefreshCw,
+  Snowflake,
 } from 'lucide-react';
 
 type TileColor = 'red' | 'yellow' | 'green' | 'blue' | 'purple' | 'orange' | 'pink' | 'cyan' | 'lime' | 'indigo' | 'amber' | 'charcoal' | 'joker' | 'grey';
@@ -29,6 +32,7 @@ interface Tile {
   number?: number;
   isJoker?: boolean;
   allowedColors?: TileColor[];
+  isFrozen?: boolean;
 }
 
 interface LevelConfig {
@@ -191,22 +195,22 @@ const LEVELS: LevelConfig[] = [
     title: 'Level 9',
     gridSize: 4,
     initialTiles: [
-      { id: 'l9-tile-1', color: 'grey' },
-      { id: 'l9-tile-2', color: 'orange' },
-      { id: 'l9-tile-3', color: 'grey' },
-      { id: 'l9-tile-4', color: 'orange', number: 4 },
-      { id: 'l9-tile-5', color: 'blue' },
-      { id: 'l9-tile-6', color: 'grey' },
-      { id: 'l9-tile-7', color: 'pink', number: 2 },
+      { id: 'l9-tile-1', color: 'orange', number: 4 },
+      { id: 'l9-tile-2', color: 'grey' },
+      { id: 'l9-tile-3', color: 'blue' },
+      { id: 'l9-tile-4', color: 'pink' },
+      { id: 'l9-tile-5', color: 'grey' },
+      { id: 'l9-tile-6', color: 'orange' },
+      { id: 'l9-tile-7', color: 'grey' },
       { id: 'l9-tile-8', color: 'orange' },
-      { id: 'l9-tile-9', color: 'grey' },
-      { id: 'l9-tile-10', color: 'pink' },
-      { id: 'l9-tile-11', color: 'grey' },
-      { id: 'l9-tile-12', color: 'orange' },
-      { id: 'l9-tile-13', color: 'blue', number: 3 },
+      { id: 'l9-tile-9', color: 'blue' },
+      { id: 'l9-tile-10', color: 'grey' },
+      { id: 'l9-tile-11', color: 'pink', number: 2 },
+      { id: 'l9-tile-12', color: 'grey' },
+      { id: 'l9-tile-13', color: 'orange' },
       { id: 'l9-tile-14', color: 'grey' },
-      { id: 'l9-tile-15', color: 'blue' },
-      { id: 'l9-tile-16', color: 'grey' },
+      { id: 'l9-tile-15', color: 'grey' },
+      { id: 'l9-tile-16', color: 'blue', number: 3 },
     ],
   },
   {
@@ -3117,7 +3121,7 @@ const LEVELS: LevelConfig[] = [
       { id: 'l91-tile-2', color: 'cyan' },
       { id: 'l91-tile-3', color: 'orange' },
       { id: 'l91-tile-4', color: 'grey' },
-      { id: 'l91-tile-5', color: 'lime', number: 7 },
+      { id: 'l91-tile-5', color: 'lime', number: 7, allowedColors: ['lime', 'green', 'yellow'] },
       { id: 'l91-tile-6', color: 'yellow' },
       { id: 'l91-tile-7', color: 'purple' },
       { id: 'l91-tile-8', color: 'blue' },
@@ -3156,7 +3160,7 @@ const LEVELS: LevelConfig[] = [
       { id: 'l91-tile-41', color: 'yellow' },
       { id: 'l91-tile-42', color: 'indigo' },
       { id: 'l91-tile-43', color: 'grey' },
-      { id: 'l91-tile-44', color: 'blue', number: 7 },
+      { id: 'l91-tile-44', color: 'blue', number: 7, allowedColors: ['blue', 'indigo', 'cyan'] },
       { id: 'l91-tile-45', color: 'green' },
       { id: 'l91-tile-46', color: 'green' },
       { id: 'l91-tile-47', color: 'indigo' },
@@ -3204,7 +3208,7 @@ const LEVELS: LevelConfig[] = [
       { id: 'l92-tile-33', color: 'pink' },
       { id: 'l92-tile-34', color: 'purple' },
       { id: 'l92-tile-35', color: 'amber' },
-      { id: 'l92-tile-36', color: 'purple', number: 7 },
+      { id: 'l92-tile-36', color: 'purple', number: 7, allowedColors: ['purple', 'pink', 'indigo', 'blue'] },
       { id: 'l92-tile-37', color: 'indigo' },
       { id: 'l92-tile-38', color: 'cyan' },
       { id: 'l92-tile-39', color: 'purple' },
@@ -3230,7 +3234,7 @@ const LEVELS: LevelConfig[] = [
       { id: 'l93-tile-3', color: 'blue' },
       { id: 'l93-tile-4', color: 'grey' },
       { id: 'l93-tile-5', color: 'green' },
-      { id: 'l93-tile-6', color: 'red', number: 7 },
+      { id: 'l93-tile-6', color: 'red', number: 7, allowedColors: ['red', 'orange', 'amber', 'pink'] },
       { id: 'l93-tile-7', color: 'red' },
       { id: 'l93-tile-8', color: 'orange' },
       { id: 'l93-tile-9', color: 'pink' },
@@ -3269,7 +3273,7 @@ const LEVELS: LevelConfig[] = [
       { id: 'l93-tile-42', color: 'pink' },
       { id: 'l93-tile-43', color: 'charcoal' },
       { id: 'l93-tile-44', color: 'indigo' },
-      { id: 'l93-tile-45', color: 'purple', number: 7 },
+      { id: 'l93-tile-45', color: 'purple', number: 7, allowedColors: ['purple', 'pink', 'indigo', 'blue'] },
       { id: 'l93-tile-46', color: 'purple' },
       { id: 'l93-tile-47', color: 'amber' },
       { id: 'l93-tile-48', color: 'blue' },
@@ -3298,7 +3302,7 @@ const LEVELS: LevelConfig[] = [
       { id: 'l94-tile-15', color: 'grey' },
       { id: 'l94-tile-16', color: 'green' },
       { id: 'l94-tile-17', color: 'blue' },
-      { id: 'l94-tile-18', color: 'cyan', number: 8 },
+      { id: 'l94-tile-18', color: 'cyan', number: 8, allowedColors: ['cyan', 'blue', 'green', 'charcoal'] },
       { id: 'l94-tile-19', color: 'charcoal' },
       { id: 'l94-tile-20', color: 'indigo' },
       { id: 'l94-tile-21', color: 'red' },
@@ -3340,7 +3344,7 @@ const LEVELS: LevelConfig[] = [
       { id: 'l95-tile-1', color: 'orange' },
       { id: 'l95-tile-2', color: 'amber' },
       { id: 'l95-tile-3', color: 'lime' },
-      { id: 'l95-tile-4', color: 'amber', number: 7 },
+      { id: 'l95-tile-4', color: 'amber', number: 7, allowedColors: ['amber', 'orange', 'red', 'charcoal'] },
       { id: 'l95-tile-5', color: 'grey' },
       { id: 'l95-tile-6', color: 'blue' },
       { id: 'l95-tile-7', color: 'purple' },
@@ -3379,7 +3383,7 @@ const LEVELS: LevelConfig[] = [
       { id: 'l95-tile-40', color: 'amber' },
       { id: 'l95-tile-41', color: 'charcoal' },
       { id: 'l95-tile-42', color: 'grey' },
-      { id: 'l95-tile-43', color: 'orange', number: 7 },
+      { id: 'l95-tile-43', color: 'orange', number: 7, allowedColors: ['orange', 'red', 'amber', 'charcoal'] },
       { id: 'l95-tile-44', color: 'red' },
       { id: 'l95-tile-45', color: 'purple' },
       { id: 'l95-tile-46', color: 'pink' },
@@ -3403,7 +3407,7 @@ const LEVELS: LevelConfig[] = [
       { id: 'l96-tile-8', color: 'lime' },
       { id: 'l96-tile-9', color: 'indigo' },
       { id: 'l96-tile-10', color: 'pink' },
-      { id: 'l96-tile-11', color: 'charcoal', number: 8 },
+      { id: 'l96-tile-11', color: 'charcoal', number: 8, allowedColors: ['charcoal', 'indigo', 'cyan', 'blue'] },
       { id: 'l96-tile-12', color: 'blue' },
       { id: 'l96-tile-13', color: 'red' },
       { id: 'l96-tile-14', color: 'grey' },
@@ -3428,7 +3432,7 @@ const LEVELS: LevelConfig[] = [
       { id: 'l96-tile-33', color: 'lime' },
       { id: 'l96-tile-34', color: 'pink', number: 8, allowedColors: ['pink', 'purple', 'red', 'orange'] },
       { id: 'l96-tile-35', color: 'pink' },
-      { id: 'l96-tile-36', color: 'blue', number: 7 },
+      { id: 'l96-tile-36', color: 'blue', number: 7, allowedColors: ['blue', 'cyan', 'indigo', 'charcoal'] },
       { id: 'l96-tile-37', color: 'amber' },
       { id: 'l96-tile-38', color: 'joker', isJoker: true },
       { id: 'l96-tile-39', color: 'green' },
@@ -3488,7 +3492,7 @@ const LEVELS: LevelConfig[] = [
       { id: 'l97-tile-37', color: 'indigo' },
       { id: 'l97-tile-38', color: 'charcoal' },
       { id: 'l97-tile-39', color: 'amber' },
-      { id: 'l97-tile-40', color: 'yellow', number: 8 },
+      { id: 'l97-tile-40', color: 'yellow', number: 8, allowedColors: ['yellow', 'amber', 'lime', 'green'] },
       { id: 'l97-tile-41', color: 'grey' },
       { id: 'l97-tile-42', color: 'green' },
       { id: 'l97-tile-43', color: 'charcoal' },
@@ -3509,7 +3513,7 @@ const LEVELS: LevelConfig[] = [
       { id: 'l98-tile-2', color: 'blue' },
       { id: 'l98-tile-3', color: 'orange' },
       { id: 'l98-tile-4', color: 'grey' },
-      { id: 'l98-tile-5', color: 'indigo', number: 8 },
+      { id: 'l98-tile-5', color: 'indigo', number: 8, allowedColors: ['indigo', 'blue', 'cyan', 'charcoal'] },
       { id: 'l98-tile-6', color: 'charcoal' },
       { id: 'l98-tile-7', color: 'lime' },
       { id: 'l98-tile-8', color: 'pink' },
@@ -3537,7 +3541,7 @@ const LEVELS: LevelConfig[] = [
       { id: 'l98-tile-30', color: 'amber' },
       { id: 'l98-tile-31', color: 'cyan' },
       { id: 'l98-tile-32', color: 'blue' },
-      { id: 'l98-tile-33', color: 'green', number: 8 },
+      { id: 'l98-tile-33', color: 'green', number: 8, allowedColors: ['green', 'lime', 'yellow', 'cyan'] },
       { id: 'l98-tile-34', color: 'lime' },
       { id: 'l98-tile-35', color: 'purple' },
       { id: 'l98-tile-36', color: 'joker', isJoker: true },
@@ -3568,7 +3572,7 @@ const LEVELS: LevelConfig[] = [
       { id: 'l99-tile-5', color: 'green' },
       { id: 'l99-tile-6', color: 'yellow' },
       { id: 'l99-tile-7', color: 'yellow' },
-      { id: 'l99-tile-8', color: 'charcoal', number: 8 },
+      { id: 'l99-tile-8', color: 'charcoal', number: 8, allowedColors: ['charcoal', 'indigo', 'cyan', 'blue'] },
       { id: 'l99-tile-9', color: 'cyan' },
       { id: 'l99-tile-10', color: 'cyan' },
       { id: 'l99-tile-11', color: 'lime' },
@@ -3620,7 +3624,7 @@ const LEVELS: LevelConfig[] = [
       { id: 'l100-tile-1', color: 'orange' },
       { id: 'l100-tile-2', color: 'amber' },
       { id: 'l100-tile-3', color: 'green' },
-      { id: 'l100-tile-4', color: 'red', number: 8 },
+      { id: 'l100-tile-4', color: 'red', number: 8, allowedColors: ['red', 'orange', 'amber', 'pink'] },
       { id: 'l100-tile-5', color: 'grey' },
       { id: 'l100-tile-6', color: 'indigo' },
       { id: 'l100-tile-7', color: 'pink' },
@@ -3653,7 +3657,7 @@ const LEVELS: LevelConfig[] = [
       { id: 'l100-tile-34', color: 'blue' },
       { id: 'l100-tile-35', color: 'blue' },
       { id: 'l100-tile-36', color: 'pink' },
-      { id: 'l100-tile-37', color: 'charcoal', number: 8 },
+      { id: 'l100-tile-37', color: 'charcoal', number: 8, allowedColors: ['charcoal', 'indigo', 'blue', 'purple'] },
       { id: 'l100-tile-38', color: 'purple' },
       { id: 'l100-tile-39', color: 'pink' },
       { id: 'l100-tile-40', color: 'purple', number: 8, allowedColors: ['purple', 'pink', 'indigo', 'red'] },
@@ -3666,6 +3670,332 @@ const LEVELS: LevelConfig[] = [
       { id: 'l100-tile-47', color: 'lime' },
       { id: 'l100-tile-48', color: 'green' },
       { id: 'l100-tile-49', color: 'red' },
+    ],
+  },
+  {
+    id: 101,
+    title: 'Level 101',
+    gridSize: 4,
+    initialTiles: [
+      { id: 'l101-tile-1', color: 'orange', number: 3 },
+      { id: 'l101-tile-2', color: 'orange' },
+      { id: 'l101-tile-3', color: 'grey' },
+      { id: 'l101-tile-4', color: 'grey' },
+      { id: 'l101-tile-5', color: 'grey' },
+      { id: 'l101-tile-6', color: 'blue', isFrozen: true },
+      { id: 'l101-tile-7', color: 'grey' },
+      { id: 'l101-tile-8', color: 'orange' },
+      { id: 'l101-tile-9', color: 'grey' },
+      { id: 'l101-tile-10', color: 'grey' },
+      { id: 'l101-tile-11', color: 'grey' },
+      { id: 'l101-tile-12', color: 'grey' },
+      { id: 'l101-tile-13', color: 'grey' },
+      { id: 'l101-tile-14', color: 'grey' },
+      { id: 'l101-tile-15', color: 'blue' },
+      { id: 'l101-tile-16', color: 'blue', number: 3 },
+    ],
+  },
+  {
+    id: 102,
+    title: 'Level 102',
+    gridSize: 4,
+    initialTiles: [
+      { id: 'l102-tile-1', color: 'green', number: 4 },
+      { id: 'l102-tile-2', color: 'grey' },
+      { id: 'l102-tile-3', color: 'green' },
+      { id: 'l102-tile-4', color: 'grey' },
+      { id: 'l102-tile-5', color: 'grey' },
+      { id: 'l102-tile-6', color: 'pink', isFrozen: true },
+      { id: 'l102-tile-7', color: 'green' },
+      { id: 'l102-tile-8', color: 'grey' },
+      { id: 'l102-tile-9', color: 'green' },
+      { id: 'l102-tile-10', color: 'grey' },
+      { id: 'l102-tile-11', color: 'pink' },
+      { id: 'l102-tile-12', color: 'grey' },
+      { id: 'l102-tile-13', color: 'grey' },
+      { id: 'l102-tile-14', color: 'grey' },
+      { id: 'l102-tile-15', color: 'grey' },
+      { id: 'l102-tile-16', color: 'pink', number: 3 },
+    ],
+  },
+  {
+    id: 103,
+    title: 'Level 103',
+    gridSize: 4,
+    initialTiles: [
+      { id: 'l103-tile-1', color: 'red', number: 3 },
+      { id: 'l103-tile-2', color: 'blue', isFrozen: true },
+      { id: 'l103-tile-3', color: 'grey' },
+      { id: 'l103-tile-4', color: 'grey' },
+      { id: 'l103-tile-5', color: 'red' },
+      { id: 'l103-tile-6', color: 'grey' },
+      { id: 'l103-tile-7', color: 'yellow' },
+      { id: 'l103-tile-8', color: 'red' },
+      { id: 'l103-tile-9', color: 'grey' },
+      { id: 'l103-tile-10', color: 'grey' },
+      { id: 'l103-tile-11', color: 'blue' },
+      { id: 'l103-tile-12', color: 'grey' },
+      { id: 'l103-tile-13', color: 'blue', number: 3 },
+      { id: 'l103-tile-14', color: 'yellow', isFrozen: true },
+      { id: 'l103-tile-15', color: 'grey' },
+      { id: 'l103-tile-16', color: 'yellow', number: 3 },
+    ],
+  },
+  {
+    id: 104,
+    title: 'Level 104',
+    gridSize: 5,
+    initialTiles: [
+      { id: 'l104-tile-1', color: 'orange', number: 4 },
+      { id: 'l104-tile-2', color: 'cyan', isFrozen: true },
+      { id: 'l104-tile-3', color: 'orange' },
+      { id: 'l104-tile-4', color: 'grey' },
+      { id: 'l104-tile-5', color: 'grey' },
+      { id: 'l104-tile-6', color: 'grey' },
+      { id: 'l104-tile-7', color: 'grey' },
+      { id: 'l104-tile-8', color: 'orange' },
+      { id: 'l104-tile-9', color: 'grey' },
+      { id: 'l104-tile-10', color: 'grey' },
+      { id: 'l104-tile-11', color: 'orange' },
+      { id: 'l104-tile-12', color: 'grey' },
+      { id: 'l104-tile-13', color: 'cyan' },
+      { id: 'l104-tile-14', color: 'grey' },
+      { id: 'l104-tile-15', color: 'purple' },
+      { id: 'l104-tile-16', color: 'grey' },
+      { id: 'l104-tile-17', color: 'grey' },
+      { id: 'l104-tile-18', color: 'cyan' },
+      { id: 'l104-tile-19', color: 'grey' },
+      { id: 'l104-tile-20', color: 'grey' },
+      { id: 'l104-tile-21', color: 'cyan', number: 4 },
+      { id: 'l104-tile-22', color: 'purple', isFrozen: true },
+      { id: 'l104-tile-23', color: 'grey' },
+      { id: 'l104-tile-24', color: 'grey' },
+      { id: 'l104-tile-25', color: 'purple', number: 3 },
+    ],
+  },
+  {
+    id: 105,
+    title: 'Level 105',
+    gridSize: 5,
+    initialTiles: [
+      { id: 'l105-tile-1', color: 'grey' },
+      { id: 'l105-tile-2', color: 'lime' },
+      { id: 'l105-tile-3', color: 'lime', number: 4 },
+      { id: 'l105-tile-4', color: 'grey' },
+      { id: 'l105-tile-5', color: 'lime' },
+      { id: 'l105-tile-6', color: 'lime' },
+      { id: 'l105-tile-7', color: 'grey' },
+      { id: 'l105-tile-8', color: 'joker', isJoker: true, isFrozen: true },
+      { id: 'l105-tile-9', color: 'grey' },
+      { id: 'l105-tile-10', color: 'grey' },
+      { id: 'l105-tile-11', color: 'grey' },
+      { id: 'l105-tile-12', color: 'grey' },
+      { id: 'l105-tile-13', color: 'grey' },
+      { id: 'l105-tile-14', color: 'indigo' },
+      { id: 'l105-tile-15', color: 'grey' },
+      { id: 'l105-tile-16', color: 'grey' },
+      { id: 'l105-tile-17', color: 'grey' },
+      { id: 'l105-tile-18', color: 'indigo', isFrozen: true },
+      { id: 'l105-tile-19', color: 'grey' },
+      { id: 'l105-tile-20', color: 'grey' },
+      { id: 'l105-tile-21', color: 'indigo' },
+      { id: 'l105-tile-22', color: 'grey' },
+      { id: 'l105-tile-23', color: 'indigo', number: 5 },
+      { id: 'l105-tile-24', color: 'grey' },
+      { id: 'l105-tile-25', color: 'grey' },
+    ],
+  },
+  {
+    id: 106,
+    title: 'Level 106',
+    gridSize: 5,
+    initialTiles: [
+      { id: 'l106-tile-1', color: 'blue', number: 4 },
+      { id: 'l106-tile-2', color: 'orange' },
+      { id: 'l106-tile-3', color: 'grey' },
+      { id: 'l106-tile-4', color: 'grey' },
+      { id: 'l106-tile-5', color: 'blue' },
+      { id: 'l106-tile-6', color: 'grey' },
+      { id: 'l106-tile-7', color: 'grey' },
+      { id: 'l106-tile-8', color: 'blue', isFrozen: true },
+      { id: 'l106-tile-9', color: 'grey' },
+      { id: 'l106-tile-10', color: 'grey' },
+      { id: 'l106-tile-11', color: 'grey' },
+      { id: 'l106-tile-12', color: 'orange' },
+      { id: 'l106-tile-13', color: 'orange', number: 5, allowedColors: ['orange', 'yellow'] },
+      { id: 'l106-tile-14', color: 'yellow' },
+      { id: 'l106-tile-15', color: 'grey' },
+      { id: 'l106-tile-16', color: 'grey' },
+      { id: 'l106-tile-17', color: 'grey' },
+      { id: 'l106-tile-18', color: 'blue', isFrozen: true },
+      { id: 'l106-tile-19', color: 'grey' },
+      { id: 'l106-tile-20', color: 'grey' },
+      { id: 'l106-tile-21', color: 'grey' },
+      { id: 'l106-tile-22', color: 'grey' },
+      { id: 'l106-tile-23', color: 'grey' },
+      { id: 'l106-tile-24', color: 'yellow' },
+      { id: 'l106-tile-25', color: 'grey' },
+    ],
+  },
+  {
+    id: 107,
+    title: 'Level 107',
+    gridSize: 5,
+    initialTiles: [
+      { id: 'l107-tile-1', color: 'pink' },
+      { id: 'l107-tile-2', color: 'pink', isFrozen: true },
+      { id: 'l107-tile-3', color: 'charcoal', number: 3 },
+      { id: 'l107-tile-4', color: 'green', isFrozen: true },
+      { id: 'l107-tile-5', color: 'green' },
+      { id: 'l107-tile-6', color: 'grey' },
+      { id: 'l107-tile-7', color: 'charcoal' },
+      { id: 'l107-tile-8', color: 'grey' },
+      { id: 'l107-tile-9', color: 'charcoal' },
+      { id: 'l107-tile-10', color: 'grey' },
+      { id: 'l107-tile-11', color: 'pink', number: 4 },
+      { id: 'l107-tile-12', color: 'grey' },
+      { id: 'l107-tile-13', color: 'grey' },
+      { id: 'l107-tile-14', color: 'amber' },
+      { id: 'l107-tile-15', color: 'green', number: 4 },
+      { id: 'l107-tile-16', color: 'pink' },
+      { id: 'l107-tile-17', color: 'grey' },
+      { id: 'l107-tile-18', color: 'grey' },
+      { id: 'l107-tile-19', color: 'grey' },
+      { id: 'l107-tile-20', color: 'green' },
+      { id: 'l107-tile-21', color: 'grey' },
+      { id: 'l107-tile-22', color: 'amber', isFrozen: true },
+      { id: 'l107-tile-23', color: 'amber', number: 3 },
+      { id: 'l107-tile-24', color: 'grey' },
+      { id: 'l107-tile-25', color: 'grey' },
+    ],
+  },
+  {
+    id: 108,
+    title: 'Level 108',
+    gridSize: 6,
+    initialTiles: [
+      { id: 'l108-tile-1', color: 'blue', number: 5, allowedColors: ['blue', 'cyan'] },
+      { id: 'l108-tile-2', color: 'grey' },
+      { id: 'l108-tile-3', color: 'grey' },
+      { id: 'l108-tile-4', color: 'blue' },
+      { id: 'l108-tile-5', color: 'grey' },
+      { id: 'l108-tile-6', color: 'cyan' },
+      { id: 'l108-tile-7', color: 'grey' },
+      { id: 'l108-tile-8', color: 'grey' },
+      { id: 'l108-tile-9', color: 'lime', isFrozen: true },
+      { id: 'l108-tile-10', color: 'grey' },
+      { id: 'l108-tile-11', color: 'grey' },
+      { id: 'l108-tile-12', color: 'blue' },
+      { id: 'l108-tile-13', color: 'grey' },
+      { id: 'l108-tile-14', color: 'grey' },
+      { id: 'l108-tile-15', color: 'grey' },
+      { id: 'l108-tile-16', color: 'grey' },
+      { id: 'l108-tile-17', color: 'cyan' },
+      { id: 'l108-tile-18', color: 'grey' },
+      { id: 'l108-tile-19', color: 'lime' },
+      { id: 'l108-tile-20', color: 'grey' },
+      { id: 'l108-tile-21', color: 'grey' },
+      { id: 'l108-tile-22', color: 'lime', number: 4 },
+      { id: 'l108-tile-23', color: 'grey' },
+      { id: 'l108-tile-24', color: 'grey' },
+      { id: 'l108-tile-25', color: 'lime' },
+      { id: 'l108-tile-26', color: 'purple' },
+      { id: 'l108-tile-27', color: 'grey' },
+      { id: 'l108-tile-28', color: 'grey' },
+      { id: 'l108-tile-29', color: 'pink', isFrozen: true },
+      { id: 'l108-tile-30', color: 'grey' },
+      { id: 'l108-tile-31', color: 'purple' },
+      { id: 'l108-tile-32', color: 'grey' },
+      { id: 'l108-tile-33', color: 'pink' },
+      { id: 'l108-tile-34', color: 'grey' },
+      { id: 'l108-tile-35', color: 'grey' },
+      { id: 'l108-tile-36', color: 'purple', number: 5, allowedColors: ['purple', 'pink'] },
+    ],
+  },
+  {
+    id: 109,
+    title: 'Level 109',
+    gridSize: 6,
+    initialTiles: [
+      { id: 'l109-tile-1', color: 'grey' },
+      { id: 'l109-tile-2', color: 'grey' },
+      { id: 'l109-tile-3', color: 'green' },
+      { id: 'l109-tile-4', color: 'red' },
+      { id: 'l109-tile-5', color: 'yellow' },
+      { id: 'l109-tile-6', color: 'grey' },
+      { id: 'l109-tile-7', color: 'grey' },
+      { id: 'l109-tile-8', color: 'red', number: 5 },
+      { id: 'l109-tile-9', color: 'red', isFrozen: true },
+      { id: 'l109-tile-10', color: 'grey' },
+      { id: 'l109-tile-11', color: 'grey' },
+      { id: 'l109-tile-12', color: 'green' },
+      { id: 'l109-tile-13', color: 'grey' },
+      { id: 'l109-tile-14', color: 'grey' },
+      { id: 'l109-tile-15', color: 'yellow', isFrozen: true },
+      { id: 'l109-tile-16', color: 'grey' },
+      { id: 'l109-tile-17', color: 'yellow', number: 5 },
+      { id: 'l109-tile-18', color: 'grey' },
+      { id: 'l109-tile-19', color: 'red' },
+      { id: 'l109-tile-20', color: 'grey' },
+      { id: 'l109-tile-21', color: 'grey' },
+      { id: 'l109-tile-22', color: 'green', isFrozen: true },
+      { id: 'l109-tile-23', color: 'grey' },
+      { id: 'l109-tile-24', color: 'grey' },
+      { id: 'l109-tile-25', color: 'yellow' },
+      { id: 'l109-tile-26', color: 'grey' },
+      { id: 'l109-tile-27', color: 'green', number: 5 },
+      { id: 'l109-tile-28', color: 'grey' },
+      { id: 'l109-tile-29', color: 'grey' },
+      { id: 'l109-tile-30', color: 'grey' },
+      { id: 'l109-tile-31', color: 'red' },
+      { id: 'l109-tile-32', color: 'grey' },
+      { id: 'l109-tile-33', color: 'grey' },
+      { id: 'l109-tile-34', color: 'green' },
+      { id: 'l109-tile-35', color: 'grey' },
+      { id: 'l109-tile-36', color: 'yellow' },
+    ],
+  },
+  {
+    id: 110,
+    title: 'Level 110',
+    gridSize: 6,
+    initialTiles: [
+      { id: 'l110-tile-1', color: 'purple', number: 4 },
+      { id: 'l110-tile-2', color: 'grey' },
+      { id: 'l110-tile-3', color: 'grey' },
+      { id: 'l110-tile-4', color: 'grey' },
+      { id: 'l110-tile-5', color: 'orange' },
+      { id: 'l110-tile-6', color: 'orange' },
+      { id: 'l110-tile-7', color: 'grey' },
+      { id: 'l110-tile-8', color: 'red', isFrozen: true },
+      { id: 'l110-tile-9', color: 'grey' },
+      { id: 'l110-tile-10', color: 'grey' },
+      { id: 'l110-tile-11', color: 'grey' },
+      { id: 'l110-tile-12', color: 'joker', isJoker: true },
+      { id: 'l110-tile-13', color: 'grey' },
+      { id: 'l110-tile-14', color: 'grey' },
+      { id: 'l110-tile-15', color: 'orange', number: 6, allowedColors: ['orange', 'red', 'amber'] },
+      { id: 'l110-tile-16', color: 'lime', isFrozen: true },
+      { id: 'l110-tile-17', color: 'grey' },
+      { id: 'l110-tile-18', color: 'grey' },
+      { id: 'l110-tile-19', color: 'grey' },
+      { id: 'l110-tile-20', color: 'grey' },
+      { id: 'l110-tile-21', color: 'amber', isFrozen: true },
+      { id: 'l110-tile-22', color: 'cyan', number: 6, allowedColors: ['cyan', 'lime', 'green'] },
+      { id: 'l110-tile-23', color: 'cyan', isFrozen: true },
+      { id: 'l110-tile-24', color: 'grey' },
+      { id: 'l110-tile-25', color: 'purple' },
+      { id: 'l110-tile-26', color: 'grey' },
+      { id: 'l110-tile-27', color: 'grey' },
+      { id: 'l110-tile-28', color: 'grey' },
+      { id: 'l110-tile-29', color: 'grey' },
+      { id: 'l110-tile-30', color: 'joker', isJoker: true },
+      { id: 'l110-tile-31', color: 'purple' },
+      { id: 'l110-tile-32', color: 'purple' },
+      { id: 'l110-tile-33', color: 'grey' },
+      { id: 'l110-tile-34', color: 'grey' },
+      { id: 'l110-tile-35', color: 'green' },
+      { id: 'l110-tile-36', color: 'cyan' },
     ],
   },
 ];
@@ -3768,6 +4098,16 @@ const LEVEL_MAX_MOVES: Record<number, number> = {
   98: 62,
   99: 65,
   100: 70,
+  101: 8,
+  102: 12,
+  103: 14,
+  104: 16,
+  105: 18,
+  106: 20,
+  107: 22,
+  108: 26,
+  109: 30,
+  110: 36,
 };
 
 const COLOR_HEX_MAP: Record<TileColor, string> = {
@@ -3873,15 +4213,37 @@ function getJokerAdjacentColors(
   return colors;
 }
 
+function levelHasSimilarGreens(level: LevelConfig): boolean {
+  let hasGreen = false;
+  let hasCyan = false;
+  let hasLime = false;
+
+  for (const t of level.initialTiles) {
+    if (t.color === 'green') hasGreen = true;
+    if (t.color === 'cyan') hasCyan = true;
+    if (t.color === 'lime') hasLime = true;
+    if (t.allowedColors) {
+      if (t.allowedColors.includes('green')) hasGreen = true;
+      if (t.allowedColors.includes('cyan')) hasCyan = true;
+      if (t.allowedColors.includes('lime')) hasLime = true;
+    }
+  }
+
+  const greenCount = (hasGreen ? 1 : 0) + (hasCyan ? 1 : 0) + (hasLime ? 1 : 0);
+  return greenCount >= 2;
+}
+
 function getTileBackgroundStyle(
   tile: Tile,
-  jokerAdjacentColors: TileColor[]
+  jokerAdjacentColors: TileColor[],
+  resolveColorHex: (c: TileColor) => string = (c) => COLOR_HEX_MAP[c],
+  resolveColorSubtleRgba: (c: TileColor) => string = (c) => COLOR_SUBTLE_RGBA_MAP[c]
 ): CSSProperties | undefined {
   // Multi-coloured number block (anchor) split styling
   if (tile.allowedColors && tile.allowedColors.length > 1) {
     if (tile.allowedColors.length === 2) {
-      const c1 = COLOR_HEX_MAP[tile.allowedColors[0]];
-      const c2 = COLOR_HEX_MAP[tile.allowedColors[1]];
+      const c1 = resolveColorHex(tile.allowedColors[0]);
+      const c2 = resolveColorHex(tile.allowedColors[1]);
       return {
         background: `linear-gradient(135deg, ${c1} 0%, ${c1} 50%, ${c2} 50%, ${c2} 100%)`,
       };
@@ -3889,7 +4251,7 @@ function getTileBackgroundStyle(
     const stops = tile.allowedColors.flatMap((c, cIdx) => {
       const startPct = Math.round((cIdx / tile.allowedColors!.length) * 100);
       const endPct = Math.round(((cIdx + 1) / tile.allowedColors!.length) * 100);
-      const hex = COLOR_HEX_MAP[c];
+      const hex = resolveColorHex(c);
       return [`${hex} ${startPct}%`, `${hex} ${endPct}%`];
     });
     return {
@@ -3904,14 +4266,14 @@ function getTileBackgroundStyle(
       'linear-gradient(135deg, #FFAAA6 0%, #FFD3B5 25%, #DCEDC2 50%, #A8E6CF 75%, #C7CEEA 100%)';
 
     if (jokerAdjacentColors.length === 1) {
-      const tint = COLOR_SUBTLE_RGBA_MAP[jokerAdjacentColors[0]];
+      const tint = resolveColorSubtleRgba(jokerAdjacentColors[0]);
       return {
         background: `linear-gradient(${tint}, ${tint}), ${rainbowBase}`,
       };
     }
     if (jokerAdjacentColors.length === 2) {
-      const c1 = COLOR_SUBTLE_RGBA_MAP[jokerAdjacentColors[0]];
-      const c2 = COLOR_SUBTLE_RGBA_MAP[jokerAdjacentColors[1]];
+      const c1 = resolveColorSubtleRgba(jokerAdjacentColors[0]);
+      const c2 = resolveColorSubtleRgba(jokerAdjacentColors[1]);
       const splitTint = `linear-gradient(135deg, ${c1} 0%, ${c1} 50%, ${c2} 50%, ${c2} 100%)`;
       return {
         background: `${splitTint}, ${rainbowBase}`,
@@ -3921,7 +4283,7 @@ function getTileBackgroundStyle(
     const stops = jokerAdjacentColors.flatMap((c, cIdx) => {
       const startPct = Math.round((cIdx / jokerAdjacentColors.length) * 100);
       const endPct = Math.round(((cIdx + 1) / jokerAdjacentColors.length) * 100);
-      const rgba = COLOR_SUBTLE_RGBA_MAP[c];
+      const rgba = resolveColorSubtleRgba(c);
       return [`${rgba} ${startPct}%`, `${rgba} ${endPct}%`];
     });
     const multiTint = `linear-gradient(135deg, ${stops.join(', ')})`;
@@ -4076,6 +4438,64 @@ function getConnectedSameColorComponent(
   return Array.from(visited);
 }
 
+function checkAndThawTiles(
+  currentTiles: Tile[],
+  gridSize: number
+): { updatedTiles: Tile[]; newlyThawedIds: string[] } {
+  // Find all anchor tiles
+  const numberedTiles = currentTiles
+    .map((tile, idx) => ({ tile, idx }))
+    .filter(({ tile }) => tile.number !== undefined);
+
+  // Find all tile indices that belong to ANY currently satisfied/completed anchor group
+  const completedGroupIndices = new Set<number>();
+
+  numberedTiles.forEach(({ idx }) => {
+    const result = getConnectedComponentForAnchor(idx, currentTiles, gridSize);
+    if (result) {
+      result.indices.forEach((cIdx) => completedGroupIndices.add(cIdx));
+    }
+  });
+
+  if (completedGroupIndices.size === 0) {
+    return { updatedTiles: currentTiles, newlyThawedIds: [] };
+  }
+
+  const newlyThawedIds: string[] = [];
+  const updatedTiles = currentTiles.map((tile, idx) => {
+    if (!tile.isFrozen) return tile;
+
+    // Check if inside completed group
+    if (completedGroupIndices.has(idx)) {
+      newlyThawedIds.push(tile.id);
+      return { ...tile, isFrozen: false };
+    }
+
+    // Check if orthogonally adjacent to any completed group tile
+    const r = Math.floor(idx / gridSize);
+    const c = idx % gridSize;
+    const neighbors = [
+      r > 0 ? (r - 1) * gridSize + c : null,
+      r < gridSize - 1 ? (r + 1) * gridSize + c : null,
+      c > 0 ? r * gridSize + (c - 1) : null,
+      c < gridSize - 1 ? r * gridSize + (c + 1) : null,
+    ];
+
+    const isAdjacentToCompleted = neighbors.some(
+      (nIdx) => nIdx !== null && completedGroupIndices.has(nIdx)
+    );
+
+    if (isAdjacentToCompleted) {
+      newlyThawedIds.push(tile.id);
+      return { ...tile, isFrozen: false };
+    }
+
+    return tile;
+  });
+
+  return { updatedTiles, newlyThawedIds };
+}
+
 function TutorialHand() {
   return (
     <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-30 select-none">
@@ -4125,7 +4545,7 @@ function getTutorialGuidance(
   selectedIndex: number | null,
   isLevelCompleted: boolean
 ): TutorialGuidance | null {
-  if (levelId > 3 && levelId !== 31 && levelId !== 61) return null;
+  if (levelId > 3 && levelId !== 31 && levelId !== 61 && levelId !== 101) return null;
 
   // Level 1: Basic Movement
   if (levelId === 1) {
@@ -4373,7 +4793,163 @@ function getTutorialGuidance(
     return null;
   }
 
+  // Level 101: Introduction to the Frozen Block & Thawing Mechanic
+  if (levelId === 101) {
+    if (isLevelCompleted) {
+      return {
+        mainText: 'LEVEL 101 COMPLETED!',
+        subText: 'FROZEN BLOCKS & THAWING MASTERED!',
+        fingerIndex: null,
+      };
+    }
+
+    const frozenTileIdx = tiles.findIndex((t) => t.isFrozen);
+    const isStillFrozen = frozenTileIdx !== -1;
+
+    if (isStillFrozen) {
+      if (selectedIndex === null) {
+        const orangeMovableIdx = tiles.findIndex(
+          (t, i) => t.color === 'orange' && t.number === undefined && i !== 1 && i !== 4
+        );
+        return {
+          mainText: 'FROZEN BLOCK DETECTED ❄️',
+          subText: 'COMPLETE ADJACENT ORANGE SET TO MELT THE ICE',
+          fingerIndex: orangeMovableIdx !== -1 ? orangeMovableIdx : 7,
+        };
+      } else {
+        const emptyTarget = tiles[4].color === 'grey' ? 4 : tiles[2].color === 'grey' ? 2 : 1;
+        return {
+          mainText: 'PLACE ADJACENT TO FROZEN BLOCK',
+          subText: 'CONNECT 3 ORANGES TO GENERATE HEAT & THAW ICE',
+          fingerIndex: emptyTarget,
+        };
+      }
+    }
+
+    // Once thawed!
+    if (selectedIndex === null) {
+      const thawedBlueIdx = tiles.findIndex((t) => t.color === 'blue' && t.number === undefined && t.id === 'l101-tile-6');
+      return {
+        mainText: 'ICE MELTED! BLOCK UNLOCKED 🔥',
+        subText: 'SELECT THE THAWED BLUE BLOCK TO MOVE',
+        fingerIndex: thawedBlueIdx !== -1 ? thawedBlueIdx : 5,
+      };
+    } else {
+      const targetEmpty = tiles[11].color === 'grey' ? 11 : tiles[10].color === 'grey' ? 10 : 8;
+      return {
+        mainText: 'CONNECT BLUE SET [3]',
+        subText: 'SWAP BLUE BLOCK TO COMPLETE LEVEL',
+        fingerIndex: targetEmpty,
+      };
+    }
+  }
+
   return null;
+}
+
+let confettiTimeouts: number[] = [];
+
+function clearConfetti() {
+  confettiTimeouts.forEach((t) => clearTimeout(t));
+  confettiTimeouts = [];
+  try {
+    confetti.reset();
+  } catch (e) {
+    // ignore
+  }
+}
+
+function triggerLevelCompleteConfetti() {
+  clearConfetti();
+
+  const colors = [
+    '#EB5872', // red
+    '#FFCE54', // yellow
+    '#48CFAD', // green
+    '#4FC1E9', // blue
+    '#7B79DB', // purple
+    '#FC6E51', // orange
+    '#EC87C0', // pink
+    '#3BC2A5', // cyan
+    '#A0D468', // lime
+    '#6366F1', // indigo
+    '#F59E0B', // amber
+    '#FFAAA6', // rainbow pink
+    '#A8E6CF', // rainbow mint
+    '#C7CEEA', // rainbow lavender
+  ];
+
+  // 1. Center fountain blast erupting upwards from the bottom
+  confetti({
+    particleCount: 80,
+    angle: 90,
+    spread: 80,
+    origin: { x: 0.5, y: 1.0 },
+    startVelocity: 58,
+    colors,
+    ticks: 320,
+    gravity: 0.88,
+    shapes: ['square', 'circle'],
+    scalar: 1.15,
+    zIndex: 9999,
+  });
+
+  // 2. Left angled cannon burst shooting up-right from the bottom-left
+  confettiTimeouts.push(
+    window.setTimeout(() => {
+      confetti({
+        particleCount: 55,
+        angle: 65,
+        spread: 60,
+        origin: { x: 0.15, y: 1.0 },
+        startVelocity: 54,
+        colors,
+        ticks: 300,
+        gravity: 0.85,
+        shapes: ['square', 'circle'],
+        scalar: 1.05,
+        zIndex: 9999,
+      });
+    }, 100)
+  );
+
+  // 3. Right angled cannon burst shooting up-left from the bottom-right
+  confettiTimeouts.push(
+    window.setTimeout(() => {
+      confetti({
+        particleCount: 55,
+        angle: 115,
+        spread: 60,
+        origin: { x: 0.85, y: 1.0 },
+        startVelocity: 54,
+        colors,
+        ticks: 300,
+        gravity: 0.85,
+        shapes: ['square', 'circle'],
+        scalar: 1.05,
+        zIndex: 9999,
+      });
+    }, 200)
+  );
+
+  // 4. Wide celebration starburst from bottom center
+  confettiTimeouts.push(
+    window.setTimeout(() => {
+      confetti({
+        particleCount: 70,
+        angle: 90,
+        spread: 120,
+        origin: { x: 0.5, y: 0.96 },
+        startVelocity: 48,
+        colors,
+        ticks: 350,
+        gravity: 0.82,
+        shapes: ['circle', 'square'],
+        scalar: 1.25,
+        zIndex: 9999,
+      });
+    }, 350)
+  );
 }
 
 export default function App() {
@@ -4385,8 +4961,11 @@ export default function App() {
 
   const [tiles, setTiles] = useState<Tile[]>(currentLevel.initialTiles);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [recentlyThawedTileIds, setRecentlyThawedTileIds] = useState<Set<string>>(new Set());
+  const [lockedTileId, setLockedTileId] = useState<string | null>(null);
   const [showHowToPlayModal, setShowHowToPlayModal] = useState<boolean>(false);
   const [hintToast, setHintToast] = useState<string | null>(null);
+  const prevCompletedRef = useRef<boolean>(false);
 
   // Moves management (Level 5+)
   const [movesLeft, setMovesLeft] = useState<number | null>(
@@ -4489,9 +5068,12 @@ export default function App() {
   };
 
   const switchLevel = (levelIndex: number) => {
+    clearConfetti();
+    prevCompletedRef.current = false;
     setCurrentLevelIndex(levelIndex);
     setTiles(LEVELS[levelIndex].initialTiles);
     setSelectedIndex(null);
+    setRecentlyThawedTileIds(new Set());
     setHintToast(null);
     setIsWatchingAd(false);
     setShowUndoAdModal(false);
@@ -4503,14 +5085,23 @@ export default function App() {
   };
 
   const handleStartPlay = () => {
+    clearConfetti();
     switchLevel(currentLevelIndex);
     setScreen('game');
   };
 
   const handleSelectLevel = (levelIdx: number) => {
+    clearConfetti();
     switchLevel(levelIdx);
     setScreen('game');
   };
+
+  // Clean up any active confetti particles or timeouts whenever changing levels or screens
+  useEffect(() => {
+    return () => {
+      clearConfetti();
+    };
+  }, [currentLevelIndex, screen]);
 
   // Determine which tiles have changed boundaries based on continuous orthogonal connected components of matching color
   const changedBoundaryTileIds = new Set<string>();
@@ -4553,9 +5144,12 @@ export default function App() {
     isLevelCompleted
   );
 
-  // Automatically unlock next level upon completing the current level
+  // Automatically unlock next level and trigger colorful confetti blast upon completing the current level
   useEffect(() => {
     if (isLevelCompleted) {
+      if (!prevCompletedRef.current) {
+        triggerLevelCompleteConfetti();
+      }
       const nextLevelNum = currentLevel.id + 1;
       if (nextLevelNum > unlockedLevelsMax && nextLevelNum <= LEVELS.length) {
         setUnlockedLevelsMax(nextLevelNum);
@@ -4566,6 +5160,7 @@ export default function App() {
         }
       }
     }
+    prevCompletedRef.current = isLevelCompleted;
   }, [isLevelCompleted, currentLevel.id, unlockedLevelsMax]);
 
   const handleTileClick = (index: number) => {
@@ -4579,6 +5174,14 @@ export default function App() {
     // Tiles with a number cannot be selected and cannot be swapped
     if (clickedTile.number !== undefined) {
       showToast('Numbered blocks are fixed anchors and cannot move!');
+      return;
+    }
+
+    // Frozen blocks cannot move or be swapped into
+    if (clickedTile.isFrozen) {
+      setLockedTileId(clickedTile.id);
+      setTimeout(() => setLockedTileId(null), 350);
+      showToast('❄️ Block is frozen in ice! Complete an adjacent group to thaw.');
       return;
     }
 
@@ -4611,7 +5214,18 @@ export default function App() {
     nextTiles[selectedIndex] = nextTiles[index];
     nextTiles[index] = temp;
 
-    setTiles(nextTiles);
+    // Check if any frozen tiles thaw from completed adjacent anchor groups
+    const { updatedTiles, newlyThawedIds } = checkAndThawTiles(nextTiles, currentLevel.gridSize);
+
+    if (newlyThawedIds.length > 0) {
+      setRecentlyThawedTileIds(new Set(newlyThawedIds));
+      setTimeout(() => {
+        setRecentlyThawedTileIds(new Set());
+      }, 1400);
+      showToast('🔥 Heat from the completed set melted the ice! Block thawed!');
+    }
+
+    setTiles(updatedTiles);
     setSelectedIndex(null);
 
     // Decrement remaining moves if level has a move limit
@@ -4621,8 +5235,11 @@ export default function App() {
   };
 
   const handleReset = () => {
+    clearConfetti();
+    prevCompletedRef.current = false;
     setTiles(currentLevel.initialTiles);
     setSelectedIndex(null);
+    setRecentlyThawedTileIds(new Set());
     setHintToast(null);
     setIsWatchingAd(false);
     setShowUndoAdModal(false);
@@ -4631,6 +5248,24 @@ export default function App() {
     const defaultMoves =
       currentLevel.maxMoves ?? LEVEL_MAX_MOVES[currentLevel.id] ?? null;
     setMovesLeft(defaultMoves);
+  };
+
+  const hasContrastingGreens = levelHasSimilarGreens(currentLevel);
+
+  const getActiveColorHex = (c: TileColor): string => {
+    if (hasContrastingGreens) {
+      if (c === 'green') return '#15803D';
+      if (c === 'cyan') return '#38D39F';
+    }
+    return COLOR_HEX_MAP[c];
+  };
+
+  const getActiveColorSubtleRgba = (c: TileColor): string => {
+    if (hasContrastingGreens) {
+      if (c === 'green') return 'rgba(21, 128, 61, 0.48)';
+      if (c === 'cyan') return 'rgba(56, 211, 159, 0.48)';
+    }
+    return COLOR_SUBTLE_RGBA_MAP[c];
   };
 
   const getTileBgClasses = (
@@ -4652,7 +5287,7 @@ export default function App() {
         case 'yellow':
           return 'bg-[#FFCE54] cursor-default shadow-xs';
         case 'green':
-          return 'bg-[#48CFAD] cursor-default shadow-xs';
+          return hasContrastingGreens ? 'bg-[#15803D] cursor-default shadow-xs' : 'bg-[#48CFAD] cursor-default shadow-xs';
         case 'blue':
           return 'bg-[#4FC1E9] cursor-default shadow-xs';
         case 'purple':
@@ -4662,7 +5297,7 @@ export default function App() {
         case 'pink':
           return 'bg-[#EC87C0] cursor-default shadow-xs';
         case 'cyan':
-          return 'bg-[#3BC2A5] cursor-default shadow-xs';
+          return hasContrastingGreens ? 'bg-[#38D39F] cursor-default shadow-xs' : 'bg-[#3BC2A5] cursor-default shadow-xs';
         case 'lime':
           return 'bg-[#A0D468] cursor-default shadow-xs';
         case 'indigo':
@@ -4688,7 +5323,7 @@ export default function App() {
         case 'yellow':
           return 'bg-[#FFCE54] cursor-not-allowed shadow-xs';
         case 'green':
-          return 'bg-[#48CFAD] cursor-not-allowed shadow-xs';
+          return hasContrastingGreens ? 'bg-[#15803D] cursor-not-allowed shadow-xs' : 'bg-[#48CFAD] cursor-not-allowed shadow-xs';
         case 'blue':
           return 'bg-[#4FC1E9] cursor-not-allowed shadow-xs';
         case 'purple':
@@ -4698,7 +5333,7 @@ export default function App() {
         case 'pink':
           return 'bg-[#EC87C0] cursor-not-allowed shadow-xs';
         case 'cyan':
-          return 'bg-[#3BC2A5] cursor-not-allowed shadow-xs';
+          return hasContrastingGreens ? 'bg-[#38D39F] cursor-not-allowed shadow-xs' : 'bg-[#3BC2A5] cursor-not-allowed shadow-xs';
         case 'lime':
           return 'bg-[#A0D468] cursor-not-allowed shadow-xs';
         case 'indigo':
@@ -4711,6 +5346,37 @@ export default function App() {
           return 'bg-[linear-gradient(135deg,#FFAAA6_0%,#FFD3B5_25%,#DCEDC2_50%,#A8E6CF_75%,#C7CEEA_100%)] cursor-not-allowed shadow-xs';
         default:
           return 'bg-[#ECEEF1] cursor-not-allowed';
+      }
+    }
+
+    if (tile.isFrozen) {
+      switch (tile.color) {
+        case 'red':
+          return 'bg-[#EB5872] cursor-pointer shadow-xs select-none';
+        case 'yellow':
+          return 'bg-[#FFCE54] cursor-pointer shadow-xs select-none';
+        case 'green':
+          return hasContrastingGreens ? 'bg-[#15803D] cursor-pointer shadow-xs select-none' : 'bg-[#48CFAD] cursor-pointer shadow-xs select-none';
+        case 'blue':
+          return 'bg-[#4FC1E9] cursor-pointer shadow-xs select-none';
+        case 'purple':
+          return 'bg-[#7B79DB] cursor-pointer shadow-xs select-none';
+        case 'orange':
+          return 'bg-[#FC6E51] cursor-pointer shadow-xs select-none';
+        case 'pink':
+          return 'bg-[#EC87C0] cursor-pointer shadow-xs select-none';
+        case 'cyan':
+          return hasContrastingGreens ? 'bg-[#38D39F] cursor-pointer shadow-xs select-none' : 'bg-[#3BC2A5] cursor-pointer shadow-xs select-none';
+        case 'lime':
+          return 'bg-[#A0D468] cursor-pointer shadow-xs select-none';
+        case 'indigo':
+          return 'bg-[#6366F1] cursor-pointer shadow-xs select-none';
+        case 'amber':
+          return 'bg-[#F59E0B] cursor-pointer shadow-xs select-none';
+        case 'charcoal':
+          return 'bg-[#475569] cursor-pointer shadow-xs select-none';
+        default:
+          return 'bg-[#4FC1E9] cursor-pointer shadow-xs select-none';
       }
     }
 
@@ -4728,7 +5394,9 @@ export default function App() {
           case 'yellow':
             return 'bg-[#FFCE54] brightness-110 ring-3 ring-inset ring-slate-900/30 shadow-md cursor-pointer z-10';
           case 'green':
-            return 'bg-[#48CFAD] brightness-110 ring-3 ring-inset ring-white shadow-md cursor-pointer z-10';
+            return hasContrastingGreens
+              ? 'bg-[#15803D] brightness-110 ring-3 ring-inset ring-white shadow-md cursor-pointer z-10'
+              : 'bg-[#48CFAD] brightness-110 ring-3 ring-inset ring-white shadow-md cursor-pointer z-10';
           case 'blue':
             return 'bg-[#4FC1E9] brightness-110 ring-3 ring-inset ring-white shadow-md cursor-pointer z-10';
           case 'purple':
@@ -4738,7 +5406,9 @@ export default function App() {
           case 'pink':
             return 'bg-[#EC87C0] brightness-110 ring-3 ring-inset ring-white shadow-md cursor-pointer z-10';
           case 'cyan':
-            return 'bg-[#3BC2A5] brightness-110 ring-3 ring-inset ring-white shadow-md cursor-pointer z-10';
+            return hasContrastingGreens
+              ? 'bg-[#38D39F] brightness-110 ring-3 ring-inset ring-white shadow-md cursor-pointer z-10'
+              : 'bg-[#3BC2A5] brightness-110 ring-3 ring-inset ring-white shadow-md cursor-pointer z-10';
           case 'lime':
             return 'bg-[#A0D468] brightness-110 ring-3 ring-inset ring-slate-900/30 shadow-md cursor-pointer z-10';
           case 'indigo':
@@ -4759,7 +5429,9 @@ export default function App() {
         case 'yellow':
           return 'bg-[#FFCE54] hover:brightness-105 active:brightness-95 shadow-xs cursor-pointer transition-all duration-150';
         case 'green':
-          return 'bg-[#48CFAD] hover:brightness-105 active:brightness-95 shadow-xs cursor-pointer transition-all duration-150';
+          return hasContrastingGreens
+            ? 'bg-[#15803D] hover:brightness-105 active:brightness-95 shadow-xs cursor-pointer transition-all duration-150'
+            : 'bg-[#48CFAD] hover:brightness-105 active:brightness-95 shadow-xs cursor-pointer transition-all duration-150';
         case 'blue':
           return 'bg-[#4FC1E9] hover:brightness-105 active:brightness-95 shadow-xs cursor-pointer transition-all duration-150';
         case 'purple':
@@ -4769,7 +5441,9 @@ export default function App() {
         case 'pink':
           return 'bg-[#EC87C0] hover:brightness-105 active:brightness-95 shadow-xs cursor-pointer transition-all duration-150';
         case 'cyan':
-          return 'bg-[#3BC2A5] hover:brightness-105 active:brightness-95 shadow-xs cursor-pointer transition-all duration-150';
+          return hasContrastingGreens
+            ? 'bg-[#38D39F] hover:brightness-105 active:brightness-95 shadow-xs cursor-pointer transition-all duration-150'
+            : 'bg-[#3BC2A5] hover:brightness-105 active:brightness-95 shadow-xs cursor-pointer transition-all duration-150';
         case 'lime':
           return 'bg-[#A0D468] hover:brightness-105 active:brightness-95 shadow-xs cursor-pointer transition-all duration-150';
         case 'indigo':
@@ -4796,13 +5470,16 @@ export default function App() {
     if (!hasChangedBoundary) {
       return 'border-transparent';
     }
+
     switch (color) {
       case 'red':
         return 'border-[#EB5872] ring-2 sm:ring-3 ring-inset ring-white/90 shadow-xs';
       case 'yellow':
         return 'border-[#FFCE54] ring-2 sm:ring-3 ring-inset ring-slate-900/30 shadow-xs';
       case 'green':
-        return 'border-[#48CFAD] ring-2 sm:ring-3 ring-inset ring-white/90 shadow-xs';
+        return hasContrastingGreens
+          ? 'border-[#15803D] ring-2 sm:ring-3 ring-inset ring-white/90 shadow-xs'
+          : 'border-[#48CFAD] ring-2 sm:ring-3 ring-inset ring-white/90 shadow-xs';
       case 'blue':
         return 'border-[#4FC1E9] ring-2 sm:ring-3 ring-inset ring-white/90 shadow-xs';
       case 'purple':
@@ -4812,7 +5489,9 @@ export default function App() {
       case 'pink':
         return 'border-[#EC87C0] ring-2 sm:ring-3 ring-inset ring-white/90 shadow-xs';
       case 'cyan':
-        return 'border-[#3BC2A5] ring-2 sm:ring-3 ring-inset ring-white/90 shadow-xs';
+        return hasContrastingGreens
+          ? 'border-[#38D39F] ring-2 sm:ring-3 ring-inset ring-white/90 shadow-xs'
+          : 'border-[#3BC2A5] ring-2 sm:ring-3 ring-inset ring-white/90 shadow-xs';
       case 'lime':
         return 'border-[#A0D468] ring-2 sm:ring-3 ring-inset ring-slate-900/30 shadow-xs';
       case 'indigo':
@@ -4878,90 +5557,193 @@ export default function App() {
     >
       {/* Home Screen View */}
       {screen === 'home' && (
-        <div className="w-full max-w-[min(92vw,72vh,420px)] flex flex-col items-center justify-between flex-1 min-h-[92vh] py-6 sm:py-8">
+        <motion.div
+          key="home-screen"
+          initial={{ opacity: 0, scale: 0.97 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.35, ease: 'easeOut' }}
+          className="relative w-full max-w-[min(92vw,72vh,420px)] flex flex-col items-center justify-between flex-1 min-h-[92vh] py-6 sm:py-8 overflow-hidden"
+        >
+          {/* Subtle Ambient Floating Background Squircles */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden -z-10">
+            <motion.div
+              animate={{
+                y: [0, -16, 0],
+                x: [0, 10, 0],
+                rotate: [0, 8, 0],
+              }}
+              transition={{ repeat: Infinity, duration: 7, ease: 'easeInOut' }}
+              className="absolute -top-6 -left-6 w-32 h-32 rounded-3xl bg-[#EB5872]/8 blur-xl"
+            />
+            <motion.div
+              animate={{
+                y: [0, 18, 0],
+                x: [0, -12, 0],
+                rotate: [0, -10, 0],
+              }}
+              transition={{ repeat: Infinity, duration: 8.5, ease: 'easeInOut', delay: 1 }}
+              className="absolute top-1/3 -right-8 w-36 h-36 rounded-3xl bg-[#4FC1E9]/8 blur-xl"
+            />
+            <motion.div
+              animate={{
+                y: [0, -14, 0],
+                x: [0, -8, 0],
+                rotate: [0, 6, 0],
+              }}
+              transition={{ repeat: Infinity, duration: 9, ease: 'easeInOut', delay: 2 }}
+              className="absolute -bottom-8 left-1/4 w-36 h-36 rounded-3xl bg-[#FFCE54]/10 blur-xl"
+            />
+          </div>
+
           <header className="w-full flex items-center justify-end px-1 pt-1">
-            <button
+            <motion.button
               type="button"
               id="home-how-to-play-button"
               onClick={() => setShowHowToPlayModal(true)}
-              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs sm:text-sm font-medium text-slate-700 bg-[#ECEEF1] hover:bg-[#DFE2E8] active:scale-95 cursor-pointer transition-all shadow-xs"
+              whileHover={{ scale: 1.05, y: -1 }}
+              whileTap={{ scale: 0.94 }}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-full text-xs sm:text-sm font-medium text-slate-700 bg-[#ECEEF1] hover:bg-[#DFE2E8] cursor-pointer transition-colors shadow-xs"
             >
               <HelpCircle className="w-4 h-4 text-slate-500" />
               <span>How to Play</span>
-            </button>
+            </motion.button>
           </header>
 
           <main className="flex flex-col items-center justify-center gap-8 w-full my-auto text-center">
-            {/* Decorative Mini 3x3 Grid Logo */}
-            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-[#F8F9FB] border border-[#ECEEF1] p-3 shadow-sm grid grid-cols-3 gap-1.5 items-center justify-center">
-              <div className="w-full h-full rounded-lg bg-[#EB5872] shadow-2xs"></div>
-              <div className="w-full h-full rounded-lg bg-[#FFCE54] shadow-2xs"></div>
-              <div className="w-full h-full rounded-lg bg-[#48CFAD] shadow-2xs"></div>
-              <div className="w-full h-full rounded-lg bg-[#4FC1E9] shadow-2xs"></div>
-              <div className="w-full h-full rounded-lg bg-[#E4E7ED] shadow-2xs"></div>
-              <div className="w-full h-full rounded-lg bg-[#7B79DB] shadow-2xs"></div>
-              <div className="w-full h-full rounded-lg bg-[#FC6E51] shadow-2xs"></div>
-              <div className="w-full h-full rounded-lg bg-[#3BC2A5] shadow-2xs"></div>
-              <div className="w-full h-full rounded-lg bg-[#A0D468] shadow-2xs"></div>
-            </div>
+            {/* Playful Floating Mini 3x3 Grid Logo */}
+            <motion.div
+              animate={{
+                y: [0, -7, 0],
+                rotate: [0, 0.5, -0.5, 0],
+              }}
+              transition={{
+                repeat: Infinity,
+                duration: 4,
+                ease: 'easeInOut',
+              }}
+              className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-[#F8F9FB] border border-[#ECEEF1] p-3 shadow-md grid grid-cols-3 gap-1.5 items-center justify-center cursor-pointer hover:shadow-lg transition-shadow"
+            >
+              {[
+                '#EB5872',
+                '#FFCE54',
+                '#48CFAD',
+                '#4FC1E9',
+                '#E4E7ED',
+                '#7B79DB',
+                '#FC6E51',
+                '#3BC2A5',
+                '#A0D468',
+              ].map((color, i) => (
+                <motion.div
+                  key={color + i}
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{
+                    delay: 0.08 + i * 0.04,
+                    type: 'spring',
+                    stiffness: 400,
+                    damping: 22,
+                  }}
+                  whileHover={{ scale: 1.25, zIndex: 10 }}
+                  style={{ backgroundColor: color }}
+                  className="w-full h-full rounded-lg shadow-2xs transition-transform"
+                />
+              ))}
+            </motion.div>
 
-            <div className="flex flex-col gap-2">
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15, duration: 0.4 }}
+              className="flex flex-col gap-2"
+            >
               <h1 id="game-title" className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-[#0F172A] tracking-tight">
                 Grid Puzzle
               </h1>
               <p className="text-sm sm:text-base font-medium text-slate-500 tracking-wide uppercase">
                 Connect Blocks & Solve Color Groups
               </p>
-            </div>
+            </motion.div>
 
-            <div className="flex flex-col gap-3.5 w-full max-w-[280px] sm:max-w-[320px] pt-4">
-              <button
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.25, duration: 0.4 }}
+              className="flex flex-col gap-3.5 w-full max-w-[280px] sm:max-w-[320px] pt-4"
+            >
+              <motion.button
                 type="button"
                 id="home-play-button"
                 onClick={handleStartPlay}
-                className="w-full py-4 px-6 rounded-2xl bg-[#0F172A] hover:bg-[#1E293B] text-white font-extrabold text-base sm:text-lg shadow-sm flex items-center justify-center gap-3 active:scale-95 cursor-pointer transition-all"
+                whileHover={{ scale: 1.03, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-full py-4 px-6 rounded-2xl bg-[#0F172A] hover:bg-[#1E293B] text-white font-extrabold text-base sm:text-lg shadow-md flex items-center justify-center gap-3 cursor-pointer transition-colors relative overflow-hidden group"
               >
+                {/* Subtle sheen highlight on play button hover */}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/15 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"
+                />
                 <Play className="w-5 h-5 fill-white" />
                 <span>PLAY (LEVEL {currentLevelIndex + 1})</span>
-              </button>
+              </motion.button>
 
-              <button
+              <motion.button
                 type="button"
                 id="home-level-selection-button"
                 onClick={() => setScreen('level-select')}
-                className="w-full py-4 px-6 rounded-2xl bg-[#ECEEF1] hover:bg-[#DFE2E8] text-[#0F172A] font-extrabold text-base sm:text-lg shadow-xs flex items-center justify-center gap-3 active:scale-95 cursor-pointer transition-all"
+                whileHover={{ scale: 1.02, y: -1 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-full py-4 px-6 rounded-2xl bg-[#ECEEF1] hover:bg-[#DFE2E8] text-[#0F172A] font-extrabold text-base sm:text-lg shadow-xs flex items-center justify-center gap-3 cursor-pointer transition-colors"
               >
                 <Grid className="w-5 h-5 text-slate-700" />
                 <span>SELECT LEVEL</span>
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
           </main>
 
-          <footer className="w-full flex items-center justify-center pt-4 pb-2">
+          <motion.footer
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.35 }}
+            className="w-full flex items-center justify-center pt-4 pb-2"
+          >
             <span className="text-xs text-slate-400 font-medium tracking-wider uppercase">
               All {LEVELS.length} Levels Unlocked
             </span>
-          </footer>
-        </div>
+          </motion.footer>
+        </motion.div>
       )}
 
       {/* Level Selection Screen View */}
       {screen === 'level-select' && (
-        <div className="w-full max-w-[min(92vw,72vh,420px)] flex flex-col items-center justify-between flex-1 min-h-[92vh] py-2 sm:py-4">
+        <motion.div
+          key="level-select-screen"
+          initial={{ opacity: 0, x: -16 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3, ease: 'easeOut' }}
+          className="w-full max-w-[min(92vw,72vh,420px)] flex flex-col items-center justify-between flex-1 min-h-[92vh] py-2 sm:py-4"
+        >
           <header id="level-select-top-bar" className="w-full flex items-center justify-between px-1 pt-1 pb-3">
-            <button
+            <motion.button
               type="button"
               id="back-to-home-button"
               onClick={() => setScreen('home')}
               aria-label="Back to Home"
-              className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#94A3B8] hover:bg-[#64748B] text-white flex items-center justify-center shadow-xs cursor-pointer active:scale-95 transition-all"
+              whileHover={{ scale: 1.08, x: -2 }}
+              whileTap={{ scale: 0.92 }}
+              className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-[#94A3B8] hover:bg-[#64748B] text-white flex items-center justify-center shadow-xs cursor-pointer transition-colors"
             >
               <Undo2 className="w-6 h-6 sm:w-7 sm:h-7 stroke-[2.5]" />
-            </button>
+            </motion.button>
 
-            <h1 id="level-select-title" className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#0F172A] tracking-tight">
+            <motion.h1
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              id="level-select-title"
+              className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#0F172A] tracking-tight"
+            >
               Levels
-            </h1>
+            </motion.h1>
 
             <div className="w-12 h-12 sm:w-14 sm:h-14"></div>
           </header>
@@ -4972,19 +5754,38 @@ export default function App() {
                 const isCurrent = currentLevelIndex === idx;
 
                 return (
-                  <button
+                  <motion.button
                     type="button"
                     key={lvl.id}
                     id={`level-button-${lvl.id}`}
                     onClick={() => handleSelectLevel(idx)}
-                    className={`relative aspect-square rounded-2xl flex flex-col items-center justify-center font-extrabold text-base sm:text-lg transition-all shadow-xs cursor-pointer active:scale-95 ${
+                    initial={{ opacity: 0, scale: 0.85 }}
+                    animate={
+                      isCurrent
+                        ? {
+                            opacity: 1,
+                            scale: [1, 1.04, 1],
+                            transition: {
+                              opacity: { duration: 0.2, delay: Math.min(0.3, idx * 0.005) },
+                              scale: { repeat: Infinity, duration: 2.4, ease: 'easeInOut' },
+                            },
+                          }
+                        : {
+                            opacity: 1,
+                            scale: 1,
+                            transition: { duration: 0.2, delay: Math.min(0.3, idx * 0.005) },
+                          }
+                    }
+                    whileHover={{ scale: 1.1, y: -2, zIndex: 10 }}
+                    whileTap={{ scale: 0.92 }}
+                    className={`relative aspect-square rounded-2xl flex flex-col items-center justify-center font-extrabold text-base sm:text-lg transition-colors shadow-xs cursor-pointer ${
                       isCurrent
                         ? 'bg-[#FA8231] text-white shadow-md ring-2 ring-white ring-offset-2 ring-offset-[#FA8231]/30'
                         : 'bg-[#ECEEF1] hover:bg-[#DFE2E8] text-[#0F172A]'
                     }`}
                   >
                     <span>{lvl.id}</span>
-                  </button>
+                  </motion.button>
                 );
               })}
             </div>
@@ -4995,7 +5796,7 @@ export default function App() {
               All {LEVELS.length} Levels Unlocked & Playable
             </span>
           </footer>
-        </div>
+        </motion.div>
       )}
 
       {/* Gameplay Screen View */}
@@ -5112,23 +5913,30 @@ export default function App() {
                   const showCssBorder = hasChangedBoundary && !hasSvgBorder;
                   const isDisabled = isLevelCompleted || hasNumber;
 
-                  const customBgStyle = getTileBackgroundStyle(tile, jokerAdjacentColors);
+                  const customBgStyle = getTileBackgroundStyle(
+                    tile,
+                    jokerAdjacentColors,
+                    getActiveColorHex,
+                    getActiveColorSubtleRgba
+                  );
                   const hasCustomJokerBg = Boolean(customBgStyle);
 
                   const showTutorialFinger =
                     tutorialGuidance !== null && tutorialGuidance.fingerIndex === index;
 
                   return (
-                    <button
+                    <motion.button
                       type="button"
                       key={tile.id}
                       id={`grid-square-${tile.id}`}
                       disabled={isDisabled}
                       onClick={() => handleTileClick(index)}
+                      animate={lockedTileId === tile.id ? { x: [-3, 3, -2, 2, 0] } : undefined}
+                      transition={{ duration: 0.28 }}
                       style={customBgStyle}
                       aria-label={`${tile.color} square${
                         hasNumber ? ` with number ${tile.number}` : ''
-                      } at position ${index + 1}${isSelected ? ', selected' : ''}${
+                      }${tile.isFrozen ? ', frozen' : ''}${isSelected ? ', selected' : ''}${
                         hasChangedBoundary ? ', matching neighbor boundary active' : ''
                       }`}
                       className={`relative w-full h-full ${getTileCornerRadius(
@@ -5153,23 +5961,23 @@ export default function App() {
                             <linearGradient id={`split-border-${tile.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
                               {activeSvgBorderColors.length === 1 ? (
                                 [
-                                  <stop key={`${tile.id}-s1`} offset="0%" stopColor={COLOR_HEX_MAP[activeSvgBorderColors[0]]} />,
-                                  <stop key={`${tile.id}-s2`} offset="100%" stopColor={COLOR_HEX_MAP[activeSvgBorderColors[0]]} />,
+                                  <stop key={`${tile.id}-s1`} offset="0%" stopColor={getActiveColorHex(activeSvgBorderColors[0])} />,
+                                  <stop key={`${tile.id}-s2`} offset="100%" stopColor={getActiveColorHex(activeSvgBorderColors[0])} />,
                                 ]
                               ) : activeSvgBorderColors.length === 2 ? (
                                 [
-                                  <stop key={`${tile.id}-s1`} offset="0%" stopColor={COLOR_HEX_MAP[activeSvgBorderColors[0]]} />,
-                                  <stop key={`${tile.id}-s2`} offset="50%" stopColor={COLOR_HEX_MAP[activeSvgBorderColors[0]]} />,
-                                  <stop key={`${tile.id}-s3`} offset="50%" stopColor={COLOR_HEX_MAP[activeSvgBorderColors[1]]} />,
-                                  <stop key={`${tile.id}-s4`} offset="100%" stopColor={COLOR_HEX_MAP[activeSvgBorderColors[1]]} />,
+                                  <stop key={`${tile.id}-s1`} offset="0%" stopColor={getActiveColorHex(activeSvgBorderColors[0])} />,
+                                  <stop key={`${tile.id}-s2`} offset="50%" stopColor={getActiveColorHex(activeSvgBorderColors[0])} />,
+                                  <stop key={`${tile.id}-s3`} offset="50%" stopColor={getActiveColorHex(activeSvgBorderColors[1])} />,
+                                  <stop key={`${tile.id}-s4`} offset="100%" stopColor={getActiveColorHex(activeSvgBorderColors[1])} />,
                                 ]
                               ) : (
                                 activeSvgBorderColors.flatMap((c, cIdx) => {
                                   const startPct = Math.round((cIdx / activeSvgBorderColors.length) * 100);
                                   const endPct = Math.round(((cIdx + 1) / activeSvgBorderColors.length) * 100);
                                   return [
-                                    <stop key={`${tile.id}-s1-${cIdx}`} offset={`${startPct}%`} stopColor={COLOR_HEX_MAP[c]} />,
-                                    <stop key={`${tile.id}-s2-${cIdx}`} offset={`${endPct}%`} stopColor={COLOR_HEX_MAP[c]} />,
+                                    <stop key={`${tile.id}-s1-${cIdx}`} offset={`${startPct}%`} stopColor={getActiveColorHex(c)} />,
+                                    <stop key={`${tile.id}-s2-${cIdx}`} offset={`${endPct}%`} stopColor={getActiveColorHex(c)} />,
                                   ];
                                 })
                               )}
@@ -5213,9 +6021,55 @@ export default function App() {
                         </span>
                       )}
 
+                      {/* Minimalist Frozen Ice Block Overlay */}
+                      {tile.isFrozen && (
+                        <div
+                          id={`tile-frozen-overlay-${tile.id}`}
+                          className={`absolute inset-0 ${getTileCornerRadius(
+                            currentLevel.gridSize
+                          )} overflow-hidden pointer-events-none z-15 flex items-center justify-center`}
+                        >
+                          {/* Translucent ice frost wash */}
+                          <div className="absolute inset-0 bg-white/40 backdrop-blur-[1px]" />
+
+                          {/* Crisp geometric inner white rim */}
+                          <div
+                            className={`absolute inset-0 border-2 border-white/80 ${getTileCornerRadius(
+                              currentLevel.gridSize
+                            )} shadow-[inset_0_1px_2px_rgba(255,255,255,0.7)]`}
+                          />
+
+                          {/* Subtle minimalist corner glint */}
+                          <div className="absolute top-1 left-1 w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 border-t-2 border-l-2 border-white/90 rounded-tl-[5px] opacity-85" />
+
+                          {/* Clean Minimalist Snowflake Crystal */}
+                          <Snowflake
+                            className="relative z-10 w-5 h-5 sm:w-6 sm:h-6 text-white drop-shadow-[0_1px_2px_rgba(15,23,42,0.18)] stroke-[2.25]"
+                          />
+                        </div>
+                      )}
+
+                      {/* Minimalist Thaw Dissolution Effect */}
+                      <AnimatePresence>
+                        {recentlyThawedTileIds.has(tile.id) && (
+                          <motion.div
+                            key={`thawed-${tile.id}`}
+                            initial={{ opacity: 1, scale: 0.95 }}
+                            animate={{ opacity: 0, scale: 1.12 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.75, ease: 'easeOut' }}
+                            className={`absolute inset-0 flex items-center justify-center pointer-events-none z-25 ${getTileCornerRadius(
+                              currentLevel.gridSize
+                            )} bg-amber-300/25 border-2 border-amber-400 shadow-sm`}
+                          >
+                            <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-amber-500 animate-pulse" />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
                       {/* Animated Guiding Finger for Active Tutorial Step */}
                       {showTutorialFinger && <TutorialHand />}
-                    </button>
+                    </motion.button>
                   );
                 })}
               </div>
@@ -5325,247 +6179,322 @@ export default function App() {
       )}
 
       {/* How to Play Rules Modal in 1010! Aesthetic */}
-      {showHowToPlayModal && (
-        <div
-          id="how-to-play-modal"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs"
-        >
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-[#FA8231] flex items-center justify-center text-white font-black text-xs shadow-xs">
-                  10
-                </div>
-                <h2 className="text-base font-black text-slate-800">How to Play & Mechanics</h2>
-              </div>
-              <button
-                type="button"
-                id="close-how-to-play-modal-button"
-                onClick={() => setShowHowToPlayModal(false)}
-                className="p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="flex flex-col gap-2.5 text-sm text-slate-600">
-              <div className="bg-[#F8F9FB] p-3.5 rounded-2xl border border-[#ECEEF1] flex flex-col gap-1">
-                <span className="font-extrabold text-slate-800 flex items-center gap-2 text-xs uppercase tracking-wide">
-                  <span className="w-5 h-5 rounded-full bg-[#FA8231] text-white text-[10px] flex items-center justify-center font-black">1</span>
-                  The Core Goal: Exact Count
-                </span>
-                <p className="text-xs text-slate-600">
-                  Form continuous groups of matching colored blocks. The total connected count in each color group must <strong>exactly equal</strong> the number on the anchor block (no more and no less). If there are too many blocks attached, the set will not complete!
-                </p>
-              </div>
-
-              <div className="bg-[#F8F9FB] p-3.5 rounded-2xl border border-[#ECEEF1] flex flex-col gap-1">
-                <span className="font-extrabold text-slate-800 flex items-center gap-2 text-xs uppercase tracking-wide">
-                  <span className="w-5 h-5 rounded-full bg-[#FA8231] text-white text-[10px] flex items-center justify-center font-black">2</span>
-                  Stationary Anchor Blocks
-                </span>
-                <p className="text-xs text-slate-600">
-                  Blocks with numbers (e.g. <strong>[2]</strong>, <strong>[4]</strong>, <strong>[6]</strong>) are fixed anchors. They <strong>cannot move or swap</strong>. All movable blocks of matching color must connect to them.
-                </p>
-              </div>
-
-              <div className="bg-[#F8F9FB] p-3.5 rounded-2xl border border-[#ECEEF1] flex flex-col gap-1">
-                <span className="font-extrabold text-slate-800 flex items-center gap-2 text-xs uppercase tracking-wide">
-                  <span className="w-5 h-5 rounded-full bg-[#FA8231] text-white text-[10px] flex items-center justify-center font-black">3</span>
-                  Swapping into Empty Blocks
-                </span>
-                <p className="text-xs text-slate-600">
-                  Tap any colored block to select it, then tap any <strong>grey empty space</strong> to swap the two tiles. Colored blocks can only move into empty spaces.
-                </p>
-              </div>
-
-              <div className="bg-[#F8F9FB] p-3.5 rounded-2xl border border-[#ECEEF1] flex flex-col gap-1">
-                <span className="font-extrabold text-slate-800 flex items-center gap-2 text-xs uppercase tracking-wide">
-                  <span className="w-5 h-5 rounded-full bg-[#FA8231] text-white text-[10px] flex items-center justify-center font-black">4</span>
-                  Orthogonal Adjacency
-                </span>
-                <p className="text-xs text-slate-600">
-                  Blocks only connect <strong>horizontally or vertically</strong>. When a group meets its target count, a vibrant border outline illuminates around the cluster!
-                </p>
-              </div>
-
-              <div className="bg-[#F8F9FB] p-3.5 rounded-2xl border border-[#ECEEF1] flex flex-col gap-1">
-                <span className="font-extrabold text-slate-800 flex items-center gap-2 text-xs uppercase tracking-wide">
-                  <span className="w-5 h-5 rounded-full bg-[linear-gradient(135deg,#FFAAA6_0%,#FFD3B5_25%,#DCEDC2_50%,#A8E6CF_75%,#C7CEEA_100%)] text-white text-[10px] flex items-center justify-center font-black">5</span>
-                  Rainbow Joker (Wildcard) Block
-                </span>
-                <p className="text-xs text-slate-600">
-                  The soothing <strong>Rainbow block</strong> acts as a universal wildcard and can connect with <strong>any color</strong> to help complete required group sizes.
-                </p>
-              </div>
-
-              <div className="bg-[#F8F9FB] p-3.5 rounded-2xl border border-[#ECEEF1] flex flex-col gap-1">
-                <span className="font-extrabold text-slate-800 flex items-center gap-2 text-xs uppercase tracking-wide">
-                  <span className="w-5 h-5 rounded-full bg-[#FA8231] text-white text-[10px] flex items-center justify-center font-black">6</span>
-                  Limited Moves (Level 5+)
-                </span>
-                <p className="text-xs text-slate-600">
-                  Starting from Level 5, you have a <strong>limited number of moves</strong>. If you run out of moves, you can restart the level or watch a quick ad to get <strong>+5 extra moves</strong>!
-                </p>
-              </div>
-
-              <div className="bg-[#F8F9FB] p-3.5 rounded-2xl border border-[#ECEEF1] flex flex-col gap-1">
-                <span className="font-extrabold text-slate-800 flex items-center gap-2 text-xs uppercase tracking-wide">
-                  <span className="w-5 h-5 rounded-full bg-[#FA8231] text-white text-[10px] flex items-center justify-center font-black">7</span>
-                  Undo Moves (Level 5+)
-                </span>
-                <p className="text-xs text-slate-600">
-                  Made a wrong move? Tap the <strong>Undo</strong> button to reverse your last move and restore your board and move count. You start with <strong>3 free Undos</strong>, and can watch an ad to get <strong>+3 more</strong> when empty!
-                </p>
-              </div>
-
-              <div className="bg-[#F8F9FB] p-3.5 rounded-2xl border border-[#ECEEF1] flex flex-col gap-1">
-                <span className="font-extrabold text-slate-800 flex items-center gap-2 text-xs uppercase tracking-wide">
-                  <span className="w-5 h-5 rounded-full bg-[linear-gradient(135deg,#EB5872_0%,#EB5872_50%,#4FC1E9_50%,#4FC1E9_100%)] text-white text-[10px] flex items-center justify-center font-black">8</span>
-                  Multi-Coloured Number Blocks (Level 61+)
-                </span>
-                <p className="text-xs text-slate-600">
-                  Numbered anchor blocks with <strong>two or more colors</strong> accept <strong>any of their listed colors</strong> to form connected sets! Place blocks of any shown color next to the multi-coloured anchor to match the required number and complete the set.
-                </p>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setShowHowToPlayModal(false)}
-              className="w-full py-3 text-xs font-black text-white bg-[#FA8231] hover:bg-[#E67325] rounded-2xl cursor-pointer transition-all shadow-xs active:scale-98"
+      <AnimatePresence>
+        {showHowToPlayModal && (
+          <motion.div
+            key="how-to-play-modal-backdrop"
+            id="how-to-play-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs"
+          >
+            <motion.div
+              key="how-to-play-modal-card"
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.94, y: 15 }}
+              transition={{ type: 'spring', stiffness: 360, damping: 28 }}
+              className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 flex flex-col gap-4 max-h-[90vh] overflow-y-auto"
             >
-              GOT IT, LET'S PLAY!
-            </button>
-          </div>
-        </div>
-      )}
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-lg bg-[#FA8231] flex items-center justify-center text-white font-black text-xs shadow-xs">
+                    10
+                  </div>
+                  <h2 className="text-base font-black text-slate-800">How to Play & Mechanics</h2>
+                </div>
+                <motion.button
+                  type="button"
+                  id="close-how-to-play-modal-button"
+                  onClick={() => setShowHowToPlayModal(false)}
+                  whileHover={{ rotate: 90, scale: 1.15 }}
+                  whileTap={{ scale: 0.9 }}
+                  className="p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 cursor-pointer transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </motion.button>
+              </div>
+
+              <div className="flex flex-col gap-2.5 text-sm text-slate-600">
+                <motion.div whileHover={{ scale: 1.015, x: 2 }} transition={{ duration: 0.15 }} className="bg-[#F8F9FB] p-3.5 rounded-2xl border border-[#ECEEF1] flex flex-col gap-1">
+                  <span className="font-extrabold text-slate-800 flex items-center gap-2 text-xs uppercase tracking-wide">
+                    <span className="w-5 h-5 rounded-full bg-[#FA8231] text-white text-[10px] flex items-center justify-center font-black">1</span>
+                    The Core Goal: Exact Count
+                  </span>
+                  <p className="text-xs text-slate-600">
+                    Form continuous groups of matching colored blocks. The total connected count in each color group must <strong>exactly equal</strong> the number on the anchor block (no more and no less). If there are too many blocks attached, the set will not complete!
+                  </p>
+                </motion.div>
+
+                <motion.div whileHover={{ scale: 1.015, x: 2 }} transition={{ duration: 0.15 }} className="bg-[#F8F9FB] p-3.5 rounded-2xl border border-[#ECEEF1] flex flex-col gap-1">
+                  <span className="font-extrabold text-slate-800 flex items-center gap-2 text-xs uppercase tracking-wide">
+                    <span className="w-5 h-5 rounded-full bg-[#FA8231] text-white text-[10px] flex items-center justify-center font-black">2</span>
+                    Stationary Anchor Blocks
+                  </span>
+                  <p className="text-xs text-slate-600">
+                    Blocks with numbers (e.g. <strong>[2]</strong>, <strong>[4]</strong>, <strong>[6]</strong>) are fixed anchors. They <strong>cannot move or swap</strong>. All movable blocks of matching color must connect to them.
+                  </p>
+                </motion.div>
+
+                <motion.div whileHover={{ scale: 1.015, x: 2 }} transition={{ duration: 0.15 }} className="bg-[#F8F9FB] p-3.5 rounded-2xl border border-[#ECEEF1] flex flex-col gap-1">
+                  <span className="font-extrabold text-slate-800 flex items-center gap-2 text-xs uppercase tracking-wide">
+                    <span className="w-5 h-5 rounded-full bg-[#FA8231] text-white text-[10px] flex items-center justify-center font-black">3</span>
+                    Swapping into Empty Blocks
+                  </span>
+                  <p className="text-xs text-slate-600">
+                    Tap any colored block to select it, then tap any <strong>grey empty space</strong> to swap the two tiles. Colored blocks can only move into empty spaces.
+                  </p>
+                </motion.div>
+
+                <motion.div whileHover={{ scale: 1.015, x: 2 }} transition={{ duration: 0.15 }} className="bg-[#F8F9FB] p-3.5 rounded-2xl border border-[#ECEEF1] flex flex-col gap-1">
+                  <span className="font-extrabold text-slate-800 flex items-center gap-2 text-xs uppercase tracking-wide">
+                    <span className="w-5 h-5 rounded-full bg-[#FA8231] text-white text-[10px] flex items-center justify-center font-black">4</span>
+                    Orthogonal Adjacency
+                  </span>
+                  <p className="text-xs text-slate-600">
+                    Blocks only connect <strong>horizontally or vertically</strong>. When a group meets its target count, a vibrant border outline illuminates around the cluster!
+                  </p>
+                </motion.div>
+
+                <motion.div whileHover={{ scale: 1.015, x: 2 }} transition={{ duration: 0.15 }} className="bg-[#F8F9FB] p-3.5 rounded-2xl border border-[#ECEEF1] flex flex-col gap-1">
+                  <span className="font-extrabold text-slate-800 flex items-center gap-2 text-xs uppercase tracking-wide">
+                    <span className="w-5 h-5 rounded-full bg-[linear-gradient(135deg,#FFAAA6_0%,#FFD3B5_25%,#DCEDC2_50%,#A8E6CF_75%,#C7CEEA_100%)] text-white text-[10px] flex items-center justify-center font-black">5</span>
+                    Rainbow Joker (Wildcard) Block
+                  </span>
+                  <p className="text-xs text-slate-600">
+                    The soothing <strong>Rainbow block</strong> acts as a universal wildcard and can connect with <strong>any color</strong> to help complete required group sizes.
+                  </p>
+                </motion.div>
+
+                <motion.div whileHover={{ scale: 1.015, x: 2 }} transition={{ duration: 0.15 }} className="bg-[#F8F9FB] p-3.5 rounded-2xl border border-[#ECEEF1] flex flex-col gap-1">
+                  <span className="font-extrabold text-slate-800 flex items-center gap-2 text-xs uppercase tracking-wide">
+                    <span className="w-5 h-5 rounded-full bg-[#FA8231] text-white text-[10px] flex items-center justify-center font-black">6</span>
+                    Limited Moves (Level 5+)
+                  </span>
+                  <p className="text-xs text-slate-600">
+                    Starting from Level 5, you have a <strong>limited number of moves</strong>. If you run out of moves, you can restart the level or watch a quick ad to get <strong>+5 extra moves</strong>!
+                  </p>
+                </motion.div>
+
+                <motion.div whileHover={{ scale: 1.015, x: 2 }} transition={{ duration: 0.15 }} className="bg-[#F8F9FB] p-3.5 rounded-2xl border border-[#ECEEF1] flex flex-col gap-1">
+                  <span className="font-extrabold text-slate-800 flex items-center gap-2 text-xs uppercase tracking-wide">
+                    <span className="w-5 h-5 rounded-full bg-[#FA8231] text-white text-[10px] flex items-center justify-center font-black">7</span>
+                    Undo Moves (Level 5+)
+                  </span>
+                  <p className="text-xs text-slate-600">
+                    Made a wrong move? Tap the <strong>Undo</strong> button to reverse your last move and restore your board and move count. You start with <strong>3 free Undos</strong>, and can watch an ad to get <strong>+3 more</strong> when empty!
+                  </p>
+                </motion.div>
+
+                <motion.div whileHover={{ scale: 1.015, x: 2 }} transition={{ duration: 0.15 }} className="bg-[#F8F9FB] p-3.5 rounded-2xl border border-[#ECEEF1] flex flex-col gap-1">
+                  <span className="font-extrabold text-slate-800 flex items-center gap-2 text-xs uppercase tracking-wide">
+                    <span className="w-5 h-5 rounded-full bg-[linear-gradient(135deg,#EB5872_0%,#EB5872_50%,#4FC1E9_50%,#4FC1E9_100%)] text-white text-[10px] flex items-center justify-center font-black">8</span>
+                    Multi-Coloured Number Blocks (Level 61+)
+                  </span>
+                  <p className="text-xs text-slate-600">
+                    Numbered anchor blocks with <strong>two or more colors</strong> accept <strong>any of their listed colors</strong> to form connected sets! Place blocks of any shown color next to the multi-coloured anchor to match the required number and complete the set.
+                  </p>
+                </motion.div>
+
+                <motion.div whileHover={{ scale: 1.015, x: 2 }} transition={{ duration: 0.15 }} className="bg-[#F8F9FB] p-3.5 rounded-2xl border border-[#ECEEF1] flex flex-col gap-1">
+                  <span className="font-extrabold text-slate-800 flex items-center gap-2 text-xs uppercase tracking-wide">
+                    <span className="w-5 h-5 rounded-full bg-sky-400 text-white text-[10px] flex items-center justify-center font-black">9</span>
+                    Frozen Blocks & Thawing (Level 101+)
+                  </span>
+                  <p className="text-xs text-slate-600">
+                    Blocks encased in <strong>crystalline ice ❄️</strong> cannot be moved or swapped. Complete an <strong>adjacent color set</strong> to radiate heat, melt the ice, and thaw the block so you can move it freely!
+                  </p>
+                </motion.div>
+              </div>
+
+              <motion.button
+                type="button"
+                onClick={() => setShowHowToPlayModal(false)}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
+                className="w-full py-3 text-xs font-black text-white bg-[#FA8231] hover:bg-[#E67325] rounded-2xl cursor-pointer transition-colors shadow-xs"
+              >
+                GOT IT, LET'S PLAY!
+              </motion.button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Out of Moves Game Over Modal */}
-      {isOutOfMoves && (
-        <div
-          id="out-of-moves-modal"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/65 backdrop-blur-xs animate-in fade-in"
-        >
-          <div className="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-7 shadow-2xl border border-slate-100 flex flex-col items-center gap-4 text-center animate-in zoom-in-95">
-            {/* Warning / Out of Moves Badge Icon */}
-            <div className="w-16 h-16 rounded-3xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-500 shadow-xs">
-              <AlertCircle className="w-9 h-9 stroke-[2.5]" />
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight">Out of Moves!</h2>
-              <p className="text-xs sm:text-sm font-medium text-slate-500">
-                You used all moves for <span className="font-bold text-slate-700">{currentLevel.title}</span>.
-              </p>
-            </div>
-
-            {/* Action Buttons: Watch Ad for +5 Moves OR Restart Level */}
-            <div className="flex flex-col gap-2.5 w-full pt-2">
-              {/* Watch Ad for +5 Moves */}
-              <button
-                type="button"
-                id="watch-ad-for-moves-button"
-                onClick={handleWatchAdForMoves}
-                disabled={isWatchingAd}
-                className="w-full py-3.5 px-4 rounded-2xl bg-[#FA8231] hover:bg-[#E67325] text-white font-extrabold text-sm sm:text-base shadow-md flex items-center justify-center gap-2.5 cursor-pointer active:scale-95 transition-all disabled:opacity-85"
+      <AnimatePresence>
+        {isOutOfMoves && (
+          <motion.div
+            key="out-of-moves-modal-backdrop"
+            id="out-of-moves-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/65 backdrop-blur-xs"
+          >
+            <motion.div
+              key="out-of-moves-modal-card"
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.94, y: 15 }}
+              transition={{ type: 'spring', stiffness: 360, damping: 28 }}
+              className="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-7 shadow-2xl border border-slate-100 flex flex-col items-center gap-4 text-center"
+            >
+              {/* Warning / Out of Moves Badge Icon */}
+              <motion.div
+                initial={{ rotate: -15, scale: 0.8 }}
+                animate={{ rotate: [0, -8, 8, 0], scale: 1 }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+                className="w-16 h-16 rounded-3xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-500 shadow-xs"
               >
-                {isWatchingAd ? (
-                  <>
-                    <RefreshCw className="w-4 h-4 animate-spin" />
-                    <span>Watching Ad ({adCountdown}s)...</span>
-                  </>
-                ) : (
-                  <>
-                    <Film className="w-4 h-4 fill-white/20" />
-                    <span>Watch Ad (+5 Moves)</span>
-                  </>
-                )}
-              </button>
+                <AlertCircle className="w-9 h-9 stroke-[2.5]" />
+              </motion.div>
 
-              {/* Restart Game */}
-              <button
-                type="button"
-                id="restart-level-out-of-moves-button"
-                onClick={handleReset}
-                disabled={isWatchingAd}
-                className="w-full py-3.5 px-4 rounded-2xl bg-[#ECEEF1] hover:bg-[#DFE2E8] text-[#0F172A] font-extrabold text-sm sm:text-base shadow-xs flex items-center justify-center gap-2 cursor-pointer active:scale-95 transition-all"
-              >
-                <RotateCcw className="w-4 h-4 text-slate-600 stroke-[2.5]" />
-                <span>Restart Level</span>
-              </button>
+              <div className="flex flex-col gap-1">
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight">Out of Moves!</h2>
+                <p className="text-xs sm:text-sm font-medium text-slate-500">
+                  You used all moves for <span className="font-bold text-slate-700">{currentLevel.title}</span>.
+                </p>
+              </div>
 
-              {/* Return to Level Select */}
-              <button
-                type="button"
-                id="back-to-levels-out-of-moves-button"
-                onClick={() => setScreen('level-select')}
-                disabled={isWatchingAd}
-                className="w-full py-1.5 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
-              >
-                Back to Levels
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+              {/* Action Buttons: Watch Ad for +5 Moves OR Restart Level */}
+              <div className="flex flex-col gap-2.5 w-full pt-2">
+                {/* Watch Ad for +5 Moves */}
+                <motion.button
+                  type="button"
+                  id="watch-ad-for-moves-button"
+                  onClick={handleWatchAdForMoves}
+                  disabled={isWatchingAd}
+                  whileHover={!isWatchingAd ? { scale: 1.03, y: -1 } : {}}
+                  whileTap={!isWatchingAd ? { scale: 0.96 } : {}}
+                  className="w-full py-3.5 px-4 rounded-2xl bg-[#FA8231] hover:bg-[#E67325] text-white font-extrabold text-sm sm:text-base shadow-md flex items-center justify-center gap-2.5 cursor-pointer transition-colors disabled:opacity-85"
+                >
+                  {isWatchingAd ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      <span>Watching Ad ({adCountdown}s)...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Film className="w-4 h-4 fill-white/20" />
+                      <span>Watch Ad (+5 Moves)</span>
+                    </>
+                  )}
+                </motion.button>
+
+                {/* Restart Game */}
+                <motion.button
+                  type="button"
+                  id="restart-level-out-of-moves-button"
+                  onClick={handleReset}
+                  disabled={isWatchingAd}
+                  whileHover={!isWatchingAd ? { scale: 1.02 } : {}}
+                  whileTap={!isWatchingAd ? { scale: 0.96 } : {}}
+                  className="w-full py-3.5 px-4 rounded-2xl bg-[#ECEEF1] hover:bg-[#DFE2E8] text-[#0F172A] font-extrabold text-sm sm:text-base shadow-xs flex items-center justify-center gap-2 cursor-pointer transition-colors"
+                >
+                  <RotateCcw className="w-4 h-4 text-slate-600 stroke-[2.5]" />
+                  <span>Restart Level</span>
+                </motion.button>
+
+                {/* Return to Level Select */}
+                <motion.button
+                  type="button"
+                  id="back-to-levels-out-of-moves-button"
+                  onClick={() => setScreen('level-select')}
+                  disabled={isWatchingAd}
+                  whileHover={{ scale: 1.05 }}
+                  className="w-full py-1.5 text-xs font-bold text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                >
+                  Back to Levels
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Out of Undos Ad Modal (Watch Ad vs Skip) */}
-      {showUndoAdModal && (
-        <div
-          id="undo-ad-modal"
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/65 backdrop-blur-xs animate-in fade-in"
-        >
-          <div className="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-7 shadow-2xl border border-slate-100 flex flex-col items-center gap-4 text-center animate-in zoom-in-95">
-            {/* Undo Badge Icon */}
-            <div className="w-16 h-16 rounded-3xl bg-amber-50 border border-amber-100 flex items-center justify-center text-[#FA8231] shadow-xs">
-              <Undo2 className="w-9 h-9 stroke-[2.5]" />
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight">Need More Undos?</h2>
-              <p className="text-xs sm:text-sm font-medium text-slate-500">
-                You have used all your free Undo moves. Watch a quick ad to receive <span className="font-bold text-slate-800">+3 Extra Undos</span>!
-              </p>
-            </div>
-
-            {/* Action Buttons: Watch Ad for +3 Undos OR Skip */}
-            <div className="flex flex-col gap-2.5 w-full pt-2">
-              <button
-                type="button"
-                id="watch-ad-for-undos-button"
-                onClick={handleWatchAdForUndos}
-                disabled={isWatchingUndoAd}
-                className="w-full py-3.5 px-4 rounded-2xl bg-[#FA8231] hover:bg-[#E67325] text-white font-extrabold text-sm sm:text-base shadow-md flex items-center justify-center gap-2.5 cursor-pointer active:scale-95 transition-all disabled:opacity-85"
+      <AnimatePresence>
+        {showUndoAdModal && (
+          <motion.div
+            key="undo-ad-modal-backdrop"
+            id="undo-ad-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/65 backdrop-blur-xs"
+          >
+            <motion.div
+              key="undo-ad-modal-card"
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.94, y: 15 }}
+              transition={{ type: 'spring', stiffness: 360, damping: 28 }}
+              className="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-7 shadow-2xl border border-slate-100 flex flex-col items-center gap-4 text-center"
+            >
+              {/* Undo Badge Icon */}
+              <motion.div
+                initial={{ rotate: -20, scale: 0.8 }}
+                animate={{ rotate: 0, scale: 1 }}
+                transition={{ duration: 0.4, ease: 'easeOut' }}
+                className="w-16 h-16 rounded-3xl bg-amber-50 border border-amber-100 flex items-center justify-center text-[#FA8231] shadow-xs"
               >
-                {isWatchingUndoAd ? (
-                  <>
-                    <RefreshCw className="w-4 h-4 animate-spin" />
-                    <span>Watching Ad ({undoAdCountdown}s)...</span>
-                  </>
-                ) : (
-                  <>
-                    <Film className="w-4 h-4 fill-white/20" />
-                    <span>Watch Ad (+3 Undos)</span>
-                  </>
-                )}
-              </button>
+                <Undo2 className="w-9 h-9 stroke-[2.5]" />
+              </motion.div>
 
-              <button
-                type="button"
-                id="skip-undo-ad-button"
-                onClick={() => {
-                  if (!isWatchingUndoAd) setShowUndoAdModal(false);
-                }}
-                disabled={isWatchingUndoAd}
-                className="w-full py-3 px-4 rounded-2xl bg-[#ECEEF1] hover:bg-[#DFE2E8] text-[#0F172A] font-extrabold text-sm shadow-xs flex items-center justify-center cursor-pointer active:scale-95 transition-all"
-              >
-                Skip
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+              <div className="flex flex-col gap-1">
+                <h2 className="text-2xl font-black text-slate-900 tracking-tight">Need More Undos?</h2>
+                <p className="text-xs sm:text-sm font-medium text-slate-500">
+                  You have used all your free Undo moves. Watch a quick ad to receive <span className="font-bold text-slate-800">+3 Extra Undos</span>!
+                </p>
+              </div>
+
+              {/* Action Buttons: Watch Ad for +3 Undos OR Skip */}
+              <div className="flex flex-col gap-2.5 w-full pt-2">
+                <motion.button
+                  type="button"
+                  id="watch-ad-for-undos-button"
+                  onClick={handleWatchAdForUndos}
+                  disabled={isWatchingUndoAd}
+                  whileHover={!isWatchingUndoAd ? { scale: 1.03, y: -1 } : {}}
+                  whileTap={!isWatchingUndoAd ? { scale: 0.96 } : {}}
+                  className="w-full py-3.5 px-4 rounded-2xl bg-[#FA8231] hover:bg-[#E67325] text-white font-extrabold text-sm sm:text-base shadow-md flex items-center justify-center gap-2.5 cursor-pointer transition-colors disabled:opacity-85"
+                >
+                  {isWatchingUndoAd ? (
+                    <>
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      <span>Watching Ad ({undoAdCountdown}s)...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Film className="w-4 h-4 fill-white/20" />
+                      <span>Watch Ad (+3 Undos)</span>
+                    </>
+                  )}
+                </motion.button>
+
+                <motion.button
+                  type="button"
+                  id="skip-undo-ad-button"
+                  onClick={() => {
+                    if (!isWatchingUndoAd) setShowUndoAdModal(false);
+                  }}
+                  disabled={isWatchingUndoAd}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.96 }}
+                  className="w-full py-3 px-4 rounded-2xl bg-[#ECEEF1] hover:bg-[#DFE2E8] text-[#0F172A] font-extrabold text-sm shadow-xs flex items-center justify-center cursor-pointer transition-colors"
+                >
+                  Skip
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
