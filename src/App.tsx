@@ -23,6 +23,7 @@ import {
   RefreshCw,
   Snowflake,
 } from 'lucide-react';
+import { LEVELS_111_150, LEVEL_MAX_MOVES_111_150 } from './levels_111_150';
 
 type TileColor = 'red' | 'yellow' | 'green' | 'blue' | 'purple' | 'orange' | 'pink' | 'cyan' | 'lime' | 'indigo' | 'amber' | 'charcoal' | 'joker' | 'grey';
 
@@ -3998,6 +3999,7 @@ const LEVELS: LevelConfig[] = [
       { id: 'l110-tile-36', color: 'cyan' },
     ],
   },
+  ...LEVELS_111_150,
 ];
 
 // Move limits starting from Level 5, adjusted progressively with difficulty
@@ -4108,6 +4110,7 @@ const LEVEL_MAX_MOVES: Record<number, number> = {
   108: 26,
   109: 30,
   110: 36,
+  ...LEVEL_MAX_MOVES_111_150,
 };
 
 const COLOR_HEX_MAP: Record<TileColor, string> = {
