@@ -22,8 +22,10 @@ import {
   AlertCircle,
   RefreshCw,
   Snowflake,
+  Star,
 } from 'lucide-react';
 import { LEVELS_111_150, LEVEL_MAX_MOVES_111_150 } from './levels_111_150';
+import { LEVEL_PAR_MOVES } from './par_moves';
 
 type TileColor = 'red' | 'yellow' | 'green' | 'blue' | 'purple' | 'orange' | 'pink' | 'cyan' | 'lime' | 'indigo' | 'amber' | 'charcoal' | 'joker' | 'grey';
 
@@ -4499,6 +4501,29 @@ function checkAndThawTiles(
   return { updatedTiles, newlyThawedIds };
 }
 
+// Par Move Rating (3-Star Mastery) helpers
+// 3 Stars: Completed in <= Par moves (optimal deduction)
+// 2 Stars: Completed within Par + 4 moves
+// 1 Star: Cleared within the level's maximum move limit
+function calculateStars(movesTaken: number, parMoves: number, maxMoves: number | null): number {
+  if (movesTaken <= parMoves) {
+    return 3;
+  }
+  if (movesTaken <= parMoves + 4) {
+    return 2;
+  }
+  if (maxMoves === null || movesTaken <= maxMoves) {
+    return 1;
+  }
+  return 1;
+}
+
+function getStarLabel(stars: number): string {
+  if (stars === 3) return 'Mastery Deduction (3 Stars)';
+  if (stars === 2) return 'Great Deduction (2 Stars)';
+  return 'Level Cleared (1 Star)';
+}
+
 function TutorialHand() {
   return (
     <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-30 select-none">
@@ -4970,10 +4995,21 @@ export default function App() {
   const [hintToast, setHintToast] = useState<string | null>(null);
   const prevCompletedRef = useRef<boolean>(false);
 
+  // Star ratings persistence
+  const [levelStars, setLevelStars] = useState<Record<number, number>>(() => {
+    try {
+      const saved = localStorage.getItem('grid_puzzle_level_stars');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
   // Moves management (Level 5+)
   const [movesLeft, setMovesLeft] = useState<number | null>(
     LEVELS[0].maxMoves ?? LEVEL_MAX_MOVES[LEVELS[0].id] ?? null
   );
+  const [movesTaken, setMovesTaken] = useState<number>(0);
   const [isWatchingAd, setIsWatchingAd] = useState<boolean>(false);
   const [adCountdown, setAdCountdown] = useState<number>(3);
 
@@ -4986,7 +5022,7 @@ export default function App() {
       return 3;
     }
   });
-  const [moveHistory, setMoveHistory] = useState<Array<{ tiles: Tile[]; movesLeft: number | null }>>([]);
+  const [moveHistory, setMoveHistory] = useState<Array<{ tiles: Tile[]; movesLeft: number | null; movesTaken: number }>>([]);
   const [showUndoAdModal, setShowUndoAdModal] = useState<boolean>(false);
   const [isWatchingUndoAd, setIsWatchingUndoAd] = useState<boolean>(false);
   const [undoAdCountdown, setUndoAdCountdown] = useState<number>(3);
@@ -5064,6 +5100,7 @@ export default function App() {
     setMoveHistory((prev) => prev.slice(0, -1));
     setTiles(prevSnapshot.tiles);
     setMovesLeft(prevSnapshot.movesLeft);
+    setMovesTaken(prevSnapshot.movesTaken);
     setSelectedIndex(null);
 
     const updated = Math.max(0, undoCount - 1);
@@ -5082,6 +5119,7 @@ export default function App() {
     setShowUndoAdModal(false);
     setIsWatchingUndoAd(false);
     setMoveHistory([]);
+    setMovesTaken(0);
     const defaultMoves =
       LEVELS[levelIndex].maxMoves ?? LEVEL_MAX_MOVES[LEVELS[levelIndex].id] ?? null;
     setMovesLeft(defaultMoves);
@@ -5098,6 +5136,8 @@ export default function App() {
     switchLevel(levelIdx);
     setScreen('game');
   };
+
+  const totalStarsEarned = Object.values(levelStars).reduce<number>((acc, s: number) => acc + (s || 0), 0);
 
   // Clean up any active confetti particles or timeouts whenever changing levels or screens
   useEffect(() => {
@@ -5147,7 +5187,11 @@ export default function App() {
     isLevelCompleted
   );
 
-  // Automatically unlock next level and trigger colorful confetti blast upon completing the current level
+  const currentParMoves = LEVEL_PAR_MOVES[currentLevel.id] ?? 3;
+  const currentLevelMaxMoves = currentLevel.maxMoves ?? LEVEL_MAX_MOVES[currentLevel.id] ?? null;
+  const currentEarnedStars = calculateStars(movesTaken, currentParMoves, currentLevelMaxMoves);
+
+  // Automatically unlock next level, save high-score star rating, and trigger colorful confetti blast upon completing the current level
   useEffect(() => {
     if (isLevelCompleted) {
       if (!prevCompletedRef.current) {
@@ -5162,9 +5206,24 @@ export default function App() {
           // ignore
         }
       }
+
+      // Record best stars earned
+      setLevelStars((prev) => {
+        const prevBest = prev[currentLevel.id] || 0;
+        if (currentEarnedStars > prevBest) {
+          const updated = { ...prev, [currentLevel.id]: currentEarnedStars };
+          try {
+            localStorage.setItem('grid_puzzle_level_stars', JSON.stringify(updated));
+          } catch (e) {
+            // ignore
+          }
+          return updated;
+        }
+        return prev;
+      });
     }
     prevCompletedRef.current = isLevelCompleted;
-  }, [isLevelCompleted, currentLevel.id, unlockedLevelsMax]);
+  }, [isLevelCompleted, currentLevel.id, unlockedLevelsMax, movesTaken, currentEarnedStars]);
 
   const handleTileClick = (index: number) => {
     // When level is completed or out of moves, prevent interaction
@@ -5209,7 +5268,7 @@ export default function App() {
     }
 
     // Record history snapshot for undo
-    setMoveHistory((prev) => [...prev, { tiles: [...tiles], movesLeft }]);
+    setMoveHistory((prev) => [...prev, { tiles: [...tiles], movesLeft, movesTaken }]);
 
     // Swapping selected colored square with clicked grey square
     const nextTiles = [...tiles];
@@ -5230,6 +5289,7 @@ export default function App() {
 
     setTiles(updatedTiles);
     setSelectedIndex(null);
+    setMovesTaken((prev) => prev + 1);
 
     // Decrement remaining moves if level has a move limit
     if (movesLeft !== null) {
@@ -5248,6 +5308,7 @@ export default function App() {
     setShowUndoAdModal(false);
     setIsWatchingUndoAd(false);
     setMoveHistory([]);
+    setMovesTaken(0);
     const defaultMoves =
       currentLevel.maxMoves ?? LEVEL_MAX_MOVES[currentLevel.id] ?? null;
     setMovesLeft(defaultMoves);
@@ -5708,8 +5769,14 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.35 }}
-            className="w-full flex items-center justify-center pt-4 pb-2"
+            className="w-full flex flex-col items-center justify-center gap-1.5 pt-4 pb-2"
           >
+            {totalStarsEarned > 0 && (
+              <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200/80 text-amber-900 text-xs font-black shadow-2xs">
+                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-500 stroke-[2.2]" />
+                <span>{totalStarsEarned} / {LEVELS.length * 3} Stars Mastered</span>
+              </div>
+            )}
             <span className="text-xs text-slate-400 font-medium tracking-wider uppercase">
               All {LEVELS.length} Levels Unlocked
             </span>
@@ -5726,7 +5793,7 @@ export default function App() {
           transition={{ duration: 0.3, ease: 'easeOut' }}
           className="w-full max-w-[min(92vw,72vh,420px)] flex flex-col items-center justify-between flex-1 min-h-[92vh] py-2 sm:py-4"
         >
-          <header id="level-select-top-bar" className="w-full flex items-center justify-between px-1 pt-1 pb-3">
+          <header id="level-select-top-bar" className="w-full flex items-center justify-between px-1 pt-1 pb-2">
             <motion.button
               type="button"
               id="back-to-home-button"
@@ -5739,14 +5806,24 @@ export default function App() {
               <Undo2 className="w-6 h-6 sm:w-7 sm:h-7 stroke-[2.5]" />
             </motion.button>
 
-            <motion.h1
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              id="level-select-title"
-              className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#0F172A] tracking-tight"
-            >
-              Levels
-            </motion.h1>
+            <div className="flex flex-col items-center justify-center">
+              <motion.h1
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                id="level-select-title"
+                className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#0F172A] tracking-tight leading-none"
+              >
+                Levels
+              </motion.h1>
+
+              {/* Total Stars Counter */}
+              {totalStarsEarned > 0 && (
+                <div id="total-stars-counter" className="flex items-center gap-1.5 mt-1 px-3 py-0.5 rounded-full bg-amber-100/80 border border-amber-200 text-amber-900 text-xs font-black shadow-2xs">
+                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-500 stroke-[2.2]" />
+                  <span>{totalStarsEarned} / {LEVELS.length * 3} Stars</span>
+                </div>
+              )}
+            </div>
 
             <div className="w-12 h-12 sm:w-14 sm:h-14"></div>
           </header>
@@ -5755,6 +5832,7 @@ export default function App() {
             <div className="grid grid-cols-5 gap-2.5 sm:gap-3.5 max-w-sm mx-auto w-full pb-6">
               {LEVELS.map((lvl, idx) => {
                 const isCurrent = currentLevelIndex === idx;
+                const earned = levelStars[lvl.id] || 0;
 
                 return (
                   <motion.button
@@ -5787,7 +5865,27 @@ export default function App() {
                         : 'bg-[#ECEEF1] hover:bg-[#DFE2E8] text-[#0F172A]'
                     }`}
                   >
-                    <span>{lvl.id}</span>
+                    <span className={earned > 0 ? 'text-sm sm:text-base -mt-1 font-black' : ''}>{lvl.id}</span>
+                    
+                    {/* Mini Star Rating Display on Level Card */}
+                    {earned > 0 && (
+                      <div className="flex items-center gap-0.5 mt-0.5">
+                        {[1, 2, 3].map((s) => (
+                          <Star
+                            key={`card-${lvl.id}-star-${s}`}
+                            className={`w-2.5 h-2.5 sm:w-3 sm:h-3 stroke-[2] ${
+                              s <= earned
+                                ? isCurrent
+                                  ? 'fill-amber-300 text-amber-300 drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]'
+                                  : 'fill-amber-400 text-amber-500'
+                                : isCurrent
+                                ? 'fill-white/20 text-white/30'
+                                : 'fill-slate-300 text-slate-300'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    )}
                   </motion.button>
                 );
               })}
@@ -5819,28 +5917,50 @@ export default function App() {
               <ArrowLeft className="w-6 h-6 sm:w-7 sm:h-7 stroke-[2.5]" />
             </button>
 
-            {/* Level Number and Moves Counter directly below it */}
+            {/* Level Number, Moves Counter & Par Target Badge */}
             <div className="flex flex-col items-center justify-center gap-1.5 sm:gap-2">
               <h1 id="level-title-display" className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#0F172A] tracking-tight leading-none">
                 {currentLevel.title}
               </h1>
 
-              {movesLeft !== null && (
+              <div className="flex items-center justify-center gap-2">
+                {movesLeft !== null ? (
+                  <div
+                    id="moves-remaining-badge"
+                    className={`flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-2xl text-xs sm:text-sm font-black tracking-wide shadow-xs border transition-all ${
+                      movesLeft <= 2
+                        ? 'bg-rose-500 border-rose-600 text-white animate-pulse shadow-rose-200 scale-105'
+                        : movesLeft <= 4
+                        ? 'bg-[#FA8231] border-amber-600 text-white shadow-amber-200'
+                        : 'bg-[#ECEEF1] border-slate-300/80 text-[#0F172A]'
+                    }`}
+                  >
+                    <span className="text-[11px] sm:text-xs opacity-80 uppercase tracking-wider font-extrabold">Moves</span>
+                    <span className="w-1 h-1 rounded-full bg-current opacity-60"></span>
+                    <span className="text-base sm:text-lg font-black tabular-nums leading-none">{movesLeft}</span>
+                  </div>
+                ) : (
+                  <div
+                    id="moves-taken-badge"
+                    className="flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-2xl text-xs sm:text-sm font-black tracking-wide shadow-xs border bg-[#ECEEF1] border-slate-300/80 text-[#0F172A]"
+                  >
+                    <span className="text-[11px] sm:text-xs opacity-80 uppercase tracking-wider font-extrabold">Moves</span>
+                    <span className="w-1 h-1 rounded-full bg-current opacity-60"></span>
+                    <span className="text-base sm:text-lg font-black tabular-nums leading-none">{movesTaken}</span>
+                  </div>
+                )}
+
+                {/* Par Rating Badge */}
                 <div
-                  id="moves-remaining-badge"
-                  className={`flex items-center gap-2 px-4 sm:px-5 py-1.5 sm:py-2 rounded-2xl text-sm sm:text-base font-black tracking-wide shadow-sm border transition-all ${
-                    movesLeft <= 2
-                      ? 'bg-rose-500 border-rose-600 text-white animate-pulse shadow-rose-200 scale-105'
-                      : movesLeft <= 4
-                      ? 'bg-[#FA8231] border-amber-600 text-white shadow-amber-200'
-                      : 'bg-[#ECEEF1] border-slate-300/80 text-[#0F172A]'
-                  }`}
+                  id="par-target-badge"
+                  title={`3 Stars: <= ${currentParMoves} moves | 2 Stars: <= ${currentParMoves + 4} moves | 1 Star: Cleared`}
+                  className="flex items-center gap-1.5 px-3 sm:px-3.5 py-1.5 rounded-2xl text-xs sm:text-sm font-black tracking-wide shadow-xs border bg-amber-50/90 border-amber-200/90 text-amber-900"
                 >
-                  <span className="text-xs sm:text-sm opacity-80 uppercase tracking-wider font-extrabold">Moves</span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-current opacity-60"></span>
-                  <span className="text-lg sm:text-xl font-black tabular-nums leading-none">{movesLeft}</span>
+                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-500 stroke-[2.2]" />
+                  <span className="text-[11px] sm:text-xs uppercase font-extrabold text-amber-800/80">Par</span>
+                  <span className="text-sm sm:text-base font-black tabular-nums leading-none text-amber-900">{currentParMoves}</span>
                 </div>
-              )}
+              </div>
             </div>
 
             {/* Reset Button on top right */}
@@ -6092,18 +6212,63 @@ export default function App() {
                 </p>
               </div>
             ) : isLevelCompleted ? (
-              <div
+              <motion.div
                 id="level-completed-status-text"
-                className="w-full flex flex-col items-center justify-center text-center px-3 select-none gap-1 animate-in fade-in"
+                initial={{ opacity: 0, y: 12, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 0.35, ease: 'easeOut' }}
+                className="w-full flex flex-col items-center justify-center text-center px-4 py-3 select-none gap-2 bg-white/95 rounded-3xl border border-slate-200/80 shadow-md backdrop-blur-xs max-w-sm mx-auto"
               >
-                <p className="text-base sm:text-lg font-black tracking-wider text-emerald-600 uppercase flex items-center justify-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-emerald-600 stroke-[2.5]" />
-                  <span>LEVEL COMPLETED!</span>
-                </p>
-                <p className="text-xs sm:text-sm font-extrabold tracking-wide text-slate-600 uppercase">
+                {/* 3-Star Rating Animation */}
+                <div id="star-rating-display" className="flex items-center justify-center gap-2.5 pt-1">
+                  {[1, 2, 3].map((starNum) => {
+                    const isEarned = starNum <= currentEarnedStars;
+                    return (
+                      <motion.div
+                        key={`earned-star-${starNum}`}
+                        initial={{ scale: 0, rotate: -30 }}
+                        animate={{ scale: isEarned ? [0, 1.35, 1] : 1, rotate: 0 }}
+                        transition={{
+                          delay: 0.15 + starNum * 0.14,
+                          duration: 0.45,
+                          type: 'spring',
+                          stiffness: 380,
+                        }}
+                        className="relative flex items-center justify-center"
+                      >
+                        <Star
+                          className={`w-7 h-7 sm:w-8 sm:h-8 transition-colors stroke-[2.2] ${
+                            isEarned
+                              ? 'fill-amber-400 text-amber-500 drop-shadow-[0_2px_8px_rgba(251,191,36,0.55)]'
+                              : 'fill-slate-100 text-slate-300'
+                          }`}
+                        />
+                      </motion.div>
+                    );
+                  })}
+                </div>
+
+                <div className="flex flex-col items-center justify-center gap-0.5">
+                  <p className="text-base sm:text-lg font-black tracking-wider text-slate-900 uppercase flex items-center justify-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-600 stroke-[2.5]" />
+                    <span>LEVEL COMPLETED!</span>
+                  </p>
+                  <span className="text-xs font-black tracking-wide uppercase px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                    {getStarLabel(currentEarnedStars)}
+                  </span>
+                </div>
+
+                {/* Score & Moves Summary */}
+                <div className="flex items-center justify-center gap-3 text-xs font-extrabold text-slate-600 border-t border-slate-100 pt-1.5 w-full">
+                  <span>Completed in <strong className="text-slate-900 font-black">{movesTaken} moves</strong></span>
+                  <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                  <span>Par: <strong className="text-amber-800 font-black">{currentParMoves} moves</strong></span>
+                </div>
+
+                <p className="text-[11px] sm:text-xs font-bold tracking-wider text-slate-400 uppercase pt-0.5">
                   TAP NEXT TO ADVANCE
                 </p>
-              </div>
+              </motion.div>
             ) : null}
           </main>
 
@@ -6269,6 +6434,30 @@ export default function App() {
                   <p className="text-xs text-slate-600">
                     The soothing <strong>Rainbow block</strong> acts as a universal wildcard and can connect with <strong>any color</strong> to help complete required group sizes.
                   </p>
+                </motion.div>
+
+                <motion.div whileHover={{ scale: 1.015, x: 2 }} transition={{ duration: 0.15 }} className="bg-[#F8F9FB] p-3.5 rounded-2xl border border-[#ECEEF1] flex flex-col gap-1">
+                  <span className="font-extrabold text-slate-800 flex items-center gap-2 text-xs uppercase tracking-wide">
+                    <span className="w-5 h-5 rounded-full bg-amber-500 text-white text-[10px] flex items-center justify-center font-black">★</span>
+                    Par Move Rating (3-Star Mastery)
+                  </span>
+                  <div className="text-xs text-slate-600 flex flex-col gap-1">
+                    <p>In addition to completing within the move limit, master levels with optimal deduction:</p>
+                    <div className="grid grid-cols-1 gap-1 pl-1">
+                      <div className="flex items-center gap-2 text-slate-700">
+                        <span className="flex text-amber-500 font-black">★★★</span>
+                        <span><strong>3 Stars:</strong> Completed in <strong>&le; Par moves</strong> (optimal deduction).</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-slate-700">
+                        <span className="flex text-amber-500 font-black">★★☆</span>
+                        <span><strong>2 Stars:</strong> Completed within <strong>Par + 4 moves</strong>.</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-slate-700">
+                        <span className="flex text-amber-500 font-black">★☆☆</span>
+                        <span><strong>1 Star:</strong> Cleared within the level's maximum move limit.</span>
+                      </div>
+                    </div>
+                  </div>
                 </motion.div>
 
                 <motion.div whileHover={{ scale: 1.015, x: 2 }} transition={{ duration: 0.15 }} className="bg-[#F8F9FB] p-3.5 rounded-2xl border border-[#ECEEF1] flex flex-col gap-1">
